@@ -7,8 +7,9 @@ public class Bumper : MonoBehaviour
     public GameObject BumperUpPrefab;
     public GameObject BumperDownPrefab;
 
-    private Vector2Int StartingPoint;
-    private Vector2Int StopingPoint;
+    public Vector2Int StartingPoint { get; private set; }
+    public Vector2Int StopingPoint { get; private set; }
+    public Vector2Int Direction { get; private set; }
 
     private GameObject BumperUp;
     private GameObject BumperDown;
@@ -17,6 +18,7 @@ public class Bumper : MonoBehaviour
     {
         this.StartingPoint = StartingPoint;
         StopingPoint = StartingPoint;
+        this.Direction = Direction;
         Vector2 pos = new Vector2(StartingPoint.x, StartingPoint.y) * MapBuilder.instance.BlockSize;
 
         Quaternion angle = Quaternion.Euler(0, 0, -90 * Direction.x);

@@ -9,12 +9,15 @@ public class CarController : MonoBehaviour
     public float RotationSpeed;
 
     private Rigidbody2D Body;
+    private Bumper Bumped = null;
 
     float Speed = 0;
     void Start()
     {
         Body = GetComponent<Rigidbody2D>();
     }
+
+
 
     // Update is called once per frame
     void FixedUpdate()
@@ -25,6 +28,10 @@ public class CarController : MonoBehaviour
 
         //rotate
         Body.MoveRotation(Body.rotation - Rotation);
+
+        //If mid-air, stop here
+        if (Bumped != null)
+            return;
 
         //If speed is less than speedMax, accelerate the car
         if ((Speed >= 0 && (Speed < SpeedMax || !AccelerationIsPositive)) ||
@@ -39,5 +46,44 @@ public class CarController : MonoBehaviour
 
         //anti-drift
         Body.velocity = transform.up * Speed;
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.transform.parent != null && collision.transform.parent.TryGetComponent(out Bumper bumper))
+            Bump(bumper);
+    }
+
+    void Bump(Bumper bumper)
+    {
+        if (Bumped != null)
+            return;
+
+        Bumped = bumper;
+        Vector2 landingPosition = new Vector2(transform.position.x, transform.position.y) + 
+            (Vector2.zero + bumper.StopingPoint - bumper.StartingPoint) * MapBuilder.instance.BlockSize;
+
+        StartCoroutine("BumpRoutine", landingPosition);
+    }
+
+    IEnumerator BumpRoutine(Vector2 landingPos)
+    {
+        float Maxtime = 0.8f;
+        float delay = 0.1f;
+        float timer = Maxtime;
+
+        gameObject.layer = LayerMask.NameToLayer("IgnorePhysics");
+
+        while (timer > 0)
+        {
+            Body.velocity = (landingPos - new Vector2(transform.position.x, transform.position.y)) / timer;
+            timer -= delay;
+            yield return new WaitForSeconds(delay);
+        }
+
+        transform.position = landingPos;
+        Body.velocity = (Vector2.zero + Bumped.Direction) * SpeedMax;
+        gameObject.layer = LayerMask.NameToLayer("Default");
+        Bumped = null;
     }
 }

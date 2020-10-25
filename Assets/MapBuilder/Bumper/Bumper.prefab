@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &3080955056907083587
+--- !u!1 &5198544206574269197
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,22 +8,22 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 3080955056907083586}
-  - component: {fileID: 3080955056907083597}
+  - component: {fileID: 5198544206574269186}
+  - component: {fileID: 1404417603984708028}
   m_Layer: 0
-  m_Name: MapBuilder
+  m_Name: Bumper
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &3080955056907083586
+--- !u!4 &5198544206574269186
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3080955056907083587}
+  m_GameObject: {fileID: 5198544206574269197}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -31,23 +31,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3080955056907083597
+--- !u!114 &1404417603984708028
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3080955056907083587}
+  m_GameObject: {fileID: 5198544206574269197}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5ff3694d392bec4eb80a11bb453a1f6, type: 3}
+  m_Script: {fileID: 11500000, guid: e89c3cbb4d6104a4c8d07a1df7eb48f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  numberBlock: 0
-  StraightLinePrefab: {fileID: 253272690909444740, guid: 709942a6f5a2b7d45897c064a7cf95ac,
+  BumperUpPrefab: {fileID: 5728982529744507487, guid: 7228faaf23ebcb447bdd576bb29eec4d,
     type: 3}
-  TurnPrefab: {fileID: 538660225591218343, guid: 7c972b4c977a56c4094ae2e0338928fa,
+  BumperDownPrefab: {fileID: 2438322656754468320, guid: 091b6b1a352c8b14aae1523f0005fed2,
     type: 3}
-  BumperPrefab: {fileID: 1404417603984708028, guid: 567fc71b7f17acd44b9672477001ec07,
-    type: 3}
-  BlockSize: 8

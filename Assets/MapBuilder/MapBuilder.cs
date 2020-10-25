@@ -4,21 +4,32 @@ using UnityEngine;
 
 public class MapBuilder : MonoBehaviour
 {
+    public static MapBuilder instance;
+
     public int numberBlock;
 
     public GameObject StraightLinePrefab;
     public GameObject TurnPrefab;
+    public Bumper BumperPrefab;
+
     public float BlockSize;
 
     private Vector2Int CurrentPosition = Vector2Int.zero;
     private Vector2Int CurrentOrientation = Vector2Int.up;
 
     private readonly Dictionary<Vector2Int, GameObject> Circuit = new Dictionary<Vector2Int, GameObject>();
+    private readonly Dictionary<Vector2Int, Bumper> Bumpers = new Dictionary<Vector2Int, Bumper>();
 
     private void Start()
     {
+        instance = this;
         for (int i = 0; i < numberBlock; i++)
             createBlock();
+    }
+
+    public bool CheckBlock(Vector2Int pos) // return true if there is a circuit block at specified coordinates
+    {
+        return Circuit.ContainsKey(pos);
     }
 
     void createBlock()
@@ -39,11 +50,8 @@ public class MapBuilder : MonoBehaviour
     }
     void createStraight()
     {
-        if(Circuit.ContainsKey(CurrentPosition)) //Trying to override an existing block
-        {
-            Debug.LogError("MapBuilder.createStraight : Circuit block already exists at coordinates : " + CurrentPosition);
-            return;
-        }
+        if (CheckBlock(CurrentPosition)) //Trying to override an existing block
+            CreateBumper();
 
         Vector2 pos = new Vector2(CurrentPosition.x , CurrentPosition.y) * BlockSize;
 
@@ -56,11 +64,8 @@ public class MapBuilder : MonoBehaviour
 
     void createTurn(bool ToLeft)
     {
-        if (Circuit.ContainsKey(CurrentPosition)) //Trying to override an existing block
-        {
-            Debug.LogError("MapBuilder.createTurn : Circuit block already exists at coordinates : " + CurrentPosition);
-            return;
-        }
+        if (CheckBlock(CurrentPosition)) //Trying to override an existing block
+            CreateBumper();
 
         Vector2 pos = new Vector2(CurrentPosition.x , CurrentPosition.y) * BlockSize;
 
@@ -71,7 +76,6 @@ public class MapBuilder : MonoBehaviour
 
         GameObject block = Instantiate(TurnPrefab, pos, angle, transform);
         Circuit.Add(CurrentPosition, block);
-
         if (!ToLeft) //Flip the turn on the horizontal Axis if the turn is to the right;
         {
             Vector3 scale = block.transform.localScale;
@@ -84,5 +88,12 @@ public class MapBuilder : MonoBehaviour
         else
             CurrentOrientation = new Vector2Int(CurrentOrientation.y, -CurrentOrientation.x);
         CurrentPosition += CurrentOrientation;
+    }
+
+    void CreateBumper()
+    {
+        Bumper bumper = Instantiate(BumperPrefab, transform);
+        Bumpers.Add(CurrentPosition - CurrentOrientation, bumper);
+        CurrentPosition = bumper.Init(CurrentPosition, CurrentOrientation);
     }
 }

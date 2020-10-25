@@ -23,7 +23,8 @@ public class MapBuilder : MonoBehaviour
     private void Start()
     {
         instance = this;
-        for (int i = 0; i < numberBlock; i++)
+        createStraight();
+        for (int i = 1; i < numberBlock; i++)
             createBlock();
     }
 
@@ -65,7 +66,11 @@ public class MapBuilder : MonoBehaviour
     void createTurn(bool ToLeft)
     {
         if (CheckBlock(CurrentPosition)) //Trying to override an existing block
+        {
             CreateBumper();
+            createStraight(); //No turning block right after a bump
+            return;
+        }
 
         Vector2 pos = new Vector2(CurrentPosition.x , CurrentPosition.y) * BlockSize;
 

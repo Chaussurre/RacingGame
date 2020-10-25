@@ -40,12 +40,17 @@ public class CarController : MonoBehaviour
 
         //Natural Deceleration
         if (Acceleration.magnitude < 0.1 || !AccelerationIsPositive)
-            Body.velocity = Body.velocity * 0.8f;
+            Body.velocity = Body.velocity * 0.95f;
 
-        Speed = Vector2.Dot(Body.velocity, transform.up);
+        Drift();
+    }
 
+   void Drift()
+    {
         //anti-drift
-        Body.velocity = transform.up * Speed;
+        Speed = Vector2.Dot(Body.velocity, transform.up);
+        Vector3 DriftSpeed = new Vector3(Body.velocity.x, Body.velocity.y) - (transform.up * Speed);
+        Body.velocity = transform.up * Speed + (DriftSpeed * 0.9f);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

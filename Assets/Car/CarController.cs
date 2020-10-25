@@ -10,6 +10,7 @@ public class CarController : MonoBehaviour
 
     private Rigidbody2D Body;
 
+    float Speed = 0;
     void Start()
     {
         Body = GetComponent<Rigidbody2D>();
@@ -18,10 +19,12 @@ public class CarController : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        float Speed = Vector2.Dot(Body.velocity, transform.up);
         Vector2 Acceleration = transform.up * Time.fixedDeltaTime * AccelSpeed * Input.GetAxis("Vertical");
         float Rotation = Speed * RotationSpeed * Time.fixedDeltaTime * RotationSpeed * Input.GetAxis("Horizontal");
         bool AccelerationIsPositive = Vector2.Dot(Acceleration, Body.velocity) > 0;
+
+        //rotate
+        Body.MoveRotation(Body.rotation - Rotation);
 
         //If speed is less than speedMax, accelerate the car
         if ((Speed >= 0 && (Speed < SpeedMax || !AccelerationIsPositive)) ||
@@ -30,16 +33,11 @@ public class CarController : MonoBehaviour
 
         //Natural Deceleration
         if (Acceleration.magnitude < 0.1 || !AccelerationIsPositive)
-            Body.velocity = Body.velocity * 0.99f;
+            Body.velocity = Body.velocity * 0.8f;
 
-        //rotate
-        Body.MoveRotation(Body.rotation - Rotation);
+        Speed = Vector2.Dot(Body.velocity, transform.up);
 
         //anti-drift
-        if (Input.GetAxisRaw("Brake") == 0)
-            if (Speed > 0)
-                Body.velocity = Body.velocity.magnitude * transform.up;
-            else
-                Body.velocity = Body.velocity.magnitude * -transform.up;
+        Body.velocity = transform.up * Speed;
     }
 }

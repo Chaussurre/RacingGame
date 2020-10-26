@@ -39,15 +39,14 @@ public class MapBuilder : MonoBehaviour
     private void Start()
     {
         Instance = this;
-        CreateBlock();
+        CreateSection();
     }
 
     private void Update()
     {
         int dist = DistanceToEnd(PositionToGrid(GameManager.Instance.FindFirstPlayer().EffectivePosition));
-        if (dist != -1)
-            for (int i = dist; i < numberBlockAdvance; i++)
-                CreateBlock();
+        if (dist != -1 && dist < numberBlockAdvance)
+                CreateSection();
 
         dist = DistanceToEnd(PositionToGrid(GameManager.Instance.FindLastPlayer().EffectivePosition), true);
         if (dist != -1)
@@ -91,7 +90,18 @@ public class MapBuilder : MonoBehaviour
         return Circuit.ContainsKey(pos);
     }
 
-    void CreateBlock()
+    void CreateSection()
+    {
+        int numberStraight = Random.Range(4, 7);
+        int clusterSize = Random.Range(12, 21);
+
+        for (int i = 0; i < numberStraight; i++)
+            CreateBlock(true);
+        for (int i = 0; i < clusterSize; i++)
+            CreateBlock(false);
+    }
+
+    void CreateBlock(bool straight)
     {
         Vector2Int PreviousPosition = CurrentPosition;
         CurrentPosition += CurrentOrientation;
@@ -99,20 +109,7 @@ public class MapBuilder : MonoBehaviour
 
         CircuitBlock circuitBlock = new CircuitBlock();
 
-
-        int choice = Random.Range(0, 3);
-        switch(choice)
-        {
-            case 0:
-                circuitBlock.block = CreateStraight();
-                break;
-            case 1:
-                circuitBlock.block = CreateTurn(true);
-                break;
-            case 2:
-                circuitBlock.block = CreateTurn(false);
-                break;
-        }
+        circuitBlock.block = ChooseBlock(straight);
 
         if (Circuit.TryGetValue(PreviousPosition, out CircuitBlock previous))
         {
@@ -130,6 +127,22 @@ public class MapBuilder : MonoBehaviour
 
         if (LastBlock == null)
             LastBlock = circuitBlock;
+    }
+
+    GameObject ChooseBlock(bool straight)
+    {
+        if (straight)
+            return CreateStraight();
+
+        int choice = Random.Range(0, 2);
+        switch (choice)
+        {
+            case 0:
+                return CreateTurn(false);
+            case 1:
+                return CreateTurn(true);
+        }
+        return null;
     }
 
     void DestroyBlock()

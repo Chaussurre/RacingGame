@@ -7,6 +7,7 @@ public class CarController : MonoBehaviour
     public float SpeedMax;
     public float AccelSpeed;
     public float RotationSpeed;
+    public float DriftFactor;
 
     private Rigidbody2D Body;
     private Bumper Bumped = null;
@@ -50,7 +51,7 @@ public class CarController : MonoBehaviour
         //anti-drift
         Speed = Vector2.Dot(Body.velocity, transform.up);
         Vector3 DriftSpeed = new Vector3(Body.velocity.x, Body.velocity.y) - (transform.up * Speed);
-        Body.velocity = transform.up * Speed + (DriftSpeed * 0.9f);
+        Body.velocity = transform.up * Speed + (DriftSpeed * DriftFactor);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

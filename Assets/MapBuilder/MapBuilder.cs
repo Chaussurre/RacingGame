@@ -6,7 +6,7 @@ public class MapBuilder : MonoBehaviour
 {
     public static MapBuilder Instance;
 
-    public int numberBlock;
+    public int numberBlockAdvance; //number of blocks generated in front of 1st player
 
     public GameObject StraightLinePrefab;
     public GameObject TurnPrefab;
@@ -36,14 +36,14 @@ public class MapBuilder : MonoBehaviour
     private void Start()
     {
         Instance = this;
-        
-        for (int i = 0; i < numberBlock; i++)
-            createBlock();
+        createBlock();
     }
 
     private void Update()
     {
-        DistanceToEnd(PositionToGrid(GameManager.Instance.FindFirstPlayer().EffectivePosition));
+        int dist = DistanceToEnd(PositionToGrid(GameManager.Instance.FindFirstPlayer().EffectivePosition));
+        for (int i = dist; i < numberBlockAdvance; i++)
+            createBlock();
     }
 
     public int DistanceToEnd(Vector2Int target, bool fromBegining = false) //How many circuit block between the start/the end of the circuit and target

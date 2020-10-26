@@ -9,8 +9,8 @@ public class MapBuilder : MonoBehaviour
     public int numberBlockAdvance; //number of blocks generated in front of 1st player
     public int numberBlockBehind; //number of blocks kept behind last player
 
-    public GameObject StraightLinePrefab;
-    public GameObject TurnPrefab;
+    public CircuitBlock StraightLinePrefab;
+    public CircuitBlock TurnPrefab;
     public Bumper BumperPrefab;
     public GameObject Blocker;
 
@@ -107,9 +107,8 @@ public class MapBuilder : MonoBehaviour
         CurrentPosition += CurrentOrientation;
         Debug.Log("createBlock : creating at " + CurrentPosition);
 
-        CircuitBlock circuitBlock = new CircuitBlock();
 
-        circuitBlock.block = ChooseBlock(straight);
+        CircuitBlock circuitBlock = ChooseBlock(straight);
 
         if (Circuit.TryGetValue(PreviousPosition, out CircuitBlock previous))
         {
@@ -122,14 +121,13 @@ public class MapBuilder : MonoBehaviour
             circuitBlock.PreviousBlock = null;
         }
 
-        circuitBlock.GridPosition = CurrentPosition;
         Circuit.Add(CurrentPosition, circuitBlock);
 
         if (LastBlock == null)
             LastBlock = circuitBlock;
     }
 
-    GameObject ChooseBlock(bool straight)
+    CircuitBlock ChooseBlock(bool straight)
     {
         if (straight)
             return CreateStraight();
@@ -149,9 +147,9 @@ public class MapBuilder : MonoBehaviour
     {
         CircuitBlock destroyed = LastBlock;
         LastBlock = destroyed.NextBlock;
-        Destroy(destroyed.block);
+        Destroy(destroyed.gameObject);
 
-        Blocker.transform.position = LastBlock.block.transform.position;
+        Blocker.transform.position = LastBlock.transform.position;
         Vector2 Direction = LastBlock.GridPosition - destroyed.GridPosition;
         Vector2Int DirectionInt = new Vector2Int(Mathf.RoundToInt(Direction.x), Mathf.RoundToInt(Direction.y));
         Blocker.transform.rotation = Quaternion.Euler(0, 0, DirectionToAngle(DirectionInt));
@@ -168,7 +166,7 @@ public class MapBuilder : MonoBehaviour
         destroyed.NextBlock = null;
 
     }
-    GameObject CreateStraight()
+    CircuitBlock CreateStraight()
     {
         if (CheckBlock(CurrentPosition)) //Trying to override an existing block
             CreateBumper();
@@ -177,11 +175,11 @@ public class MapBuilder : MonoBehaviour
 
         Quaternion angle = Quaternion.Euler(0, 0, 90 * CurrentOrientation.x);
 
-        GameObject block = Instantiate(StraightLinePrefab, pos, angle, transform);
+        CircuitBlock block = Instantiate(StraightLinePrefab, pos, angle, transform);
         return block;
     }
 
-    GameObject CreateTurn(bool ToLeft)
+    CircuitBlock CreateTurn(bool ToLeft)
     {
         if (CheckBlock(CurrentPosition)) //Trying to override an existing block
         {
@@ -193,7 +191,7 @@ public class MapBuilder : MonoBehaviour
 
         Quaternion angle = Quaternion.Euler(0, 0, DirectionToAngle(CurrentOrientation));
 
-        GameObject block = Instantiate(TurnPrefab, pos, angle, transform);
+        CircuitBlock block = Instantiate(TurnPrefab, pos, angle, transform);
         if (!ToLeft) //Flip the turn on the horizontal Axis if the turn is to the right;
         {
             Vector3 scale = block.transform.localScale;

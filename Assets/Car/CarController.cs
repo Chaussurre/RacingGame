@@ -10,8 +10,12 @@ public class CarController : MonoBehaviour
     public float SlowRotationSpeed;
     public float DriftFactor;
 
+    public Color color;
+
     public Vector2 EffectivePosition { get; private set; } //The car's position in the circuit that takes bumper into account
 
+    [SerializeField]
+    private SpriteRenderer ColorCarRenderer;
     private Rigidbody2D Body;
     private Bumper Bumped = null;
 
@@ -21,6 +25,7 @@ public class CarController : MonoBehaviour
     void Start()
     {
         Body = GetComponent<Rigidbody2D>();
+        ColorCarRenderer.color = color;
     }
 
     // Update is called once per frame

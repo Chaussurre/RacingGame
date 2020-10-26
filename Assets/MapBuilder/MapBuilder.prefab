@@ -48,7 +48,7 @@ MonoBehaviour:
   numberBlockBehind: 5
   StraightLinePrefab: {fileID: -4932092860563911818, guid: 709942a6f5a2b7d45897c064a7cf95ac,
     type: 3}
-  TurnPrefab: {fileID: 788111888211829620, guid: 7c972b4c977a56c4094ae2e0338928fa,
+  TurnPrefab: {fileID: -7199571914526733392, guid: 7c972b4c977a56c4094ae2e0338928fa,
     type: 3}
   BumperPrefab: {fileID: 1404417603984708028, guid: 567fc71b7f17acd44b9672477001ec07,
     type: 3}

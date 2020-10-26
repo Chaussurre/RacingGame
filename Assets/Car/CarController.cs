@@ -31,6 +31,13 @@ public class CarController : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        if (MapBuilder.Instance.Circuit.TryGetValue(MapBuilder.Instance.PositionToGrid(EffectivePosition), out CircuitBlock block))
+        {
+            block.GetProgress(EffectivePosition, out Vector2 Normal);
+            Debug.Log("Drawing ray : " + Normal);
+            Debug.DrawRay(EffectivePosition, Normal, Color.red);
+        }
+
         PreviousSpeed = Body.velocity;
 
         //If mid-air, stop here

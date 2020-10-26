@@ -270,7 +270,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1800860883}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -63.42775, y: -97.20389, z: -209.79398}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1966257249}
@@ -377,32 +377,32 @@ PrefabInstance:
     - target: {fileID: 3080955056907083586, guid: 3834801ab53814a4aae003de4340262e,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 63.42775
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3080955056907083586, guid: 3834801ab53814a4aae003de4340262e,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 97.20389
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3080955056907083586, guid: 3834801ab53814a4aae003de4340262e,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 209.79398
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3080955056907083586, guid: 3834801ab53814a4aae003de4340262e,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3080955056907083586, guid: 3834801ab53814a4aae003de4340262e,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3080955056907083586, guid: 3834801ab53814a4aae003de4340262e,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3080955056907083586, guid: 3834801ab53814a4aae003de4340262e,
         type: 3}
@@ -433,16 +433,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: MapBuilder
-      objectReference: {fileID: 0}
-    - target: {fileID: 3080955056907083597, guid: 3834801ab53814a4aae003de4340262e,
-        type: 3}
-      propertyPath: numberBlockAdvance
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 3080955056907083597, guid: 3834801ab53814a4aae003de4340262e,
-        type: 3}
-      propertyPath: numberBlockBehind
-      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3834801ab53814a4aae003de4340262e, type: 3}

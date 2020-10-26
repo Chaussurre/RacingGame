@@ -5,17 +5,29 @@ using UnityEngine;
 public class CircuitBlock : MonoBehaviour
 {
     public Vector2Int GridPosition { get; private set; }
+    public Vector2Int Orientation { get; private set; }
     [HideInInspector]
     public CircuitBlock NextBlock;
     [HideInInspector]
     public CircuitBlock PreviousBlock;
 
-    private void Start()
+    public void Init(Vector2Int GridPosition, Vector2Int Orientation)
     {
-        float BlockSize = MapBuilder.Instance.BlockSize;
-        int x = Mathf.RoundToInt(transform.position.x / BlockSize);
-        int y = Mathf.RoundToInt(transform.position.y / BlockSize);
+        this.GridPosition = GridPosition;
+        this.Orientation = Orientation;
 
-        GridPosition = new Vector2Int(x, y);
+        transform.position = new Vector2(GridPosition.x, GridPosition.y) * MapBuilder.Instance.BlockSize;
+        transform.rotation = Quaternion.Euler(0, 0, MapBuilder.DirectionToAngle(Orientation));
+    }
+
+    public virtual float GetProgress(Vector3 Position, out Vector2 Normal)
+    {
+        Vector2 relativPos = Position - transform.position;
+
+        float progress = Vector2.Dot(relativPos, Orientation);
+        Vector2 projection = (Vector2.zero + Orientation) * progress;
+        Normal = new Vector2(Orientation.y, Orientation.x);
+
+        return progress;
     }
 }

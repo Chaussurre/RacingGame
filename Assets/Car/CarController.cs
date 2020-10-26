@@ -23,16 +23,16 @@ public class CarController : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        //If mid-air, stop here
+        if (Bumped != null)
+            return;
+
         Vector2 Acceleration = transform.up * Time.fixedDeltaTime * AccelSpeed * Input.GetAxis("Vertical");
         float Rotation = Speed * RotationSpeed * Time.fixedDeltaTime * RotationSpeed * Input.GetAxis("Horizontal");
         bool AccelerationIsPositive = Vector2.Dot(Acceleration, Body.velocity) > 0;
 
         //rotate
         Body.MoveRotation(Body.rotation - Rotation);
-
-        //If mid-air, stop here
-        if (Bumped != null)
-            return;
 
         //If speed is less than speedMax, accelerate the car
         if ((Speed >= 0 && (Speed < SpeedMax || !AccelerationIsPositive)) ||
@@ -48,7 +48,6 @@ public class CarController : MonoBehaviour
 
    void Drift()
     {
-        //anti-drift
         Speed = Vector2.Dot(Body.velocity, transform.up);
         Vector3 DriftSpeed = new Vector3(Body.velocity.x, Body.velocity.y) - (transform.up * Speed);
         Body.velocity = transform.up * Speed + (DriftSpeed * DriftFactor);
@@ -68,6 +67,8 @@ public class CarController : MonoBehaviour
         Bumped = bumper;
         Vector2 landingPosition = new Vector2(transform.position.x, transform.position.y) + 
             (Vector2.zero + bumper.StopingPoint - bumper.StartingPoint) * MapBuilder.instance.BlockSize;
+
+        transform.rotation = Quaternion.Euler(0, 0, MapBuilder.DirectionToAngle(bumper.Direction));
 
         StartCoroutine("BumpRoutine", landingPosition);
     }

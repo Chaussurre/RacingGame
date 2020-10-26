@@ -20,6 +20,15 @@ public class MapBuilder : MonoBehaviour
     private readonly Dictionary<Vector2Int, GameObject> Circuit = new Dictionary<Vector2Int, GameObject>();
     private readonly Dictionary<Vector2Int, Bumper> Bumpers = new Dictionary<Vector2Int, Bumper>();
 
+    public static float DirectionToAngle(Vector2Int Direction)
+    {
+        float angle = -90 * Direction.x;
+        if (Direction.y == -1)
+            angle = 180;
+
+        return angle;
+    }
+
     private void Start()
     {
         instance = this;
@@ -74,10 +83,7 @@ public class MapBuilder : MonoBehaviour
 
         Vector2 pos = new Vector2(CurrentPosition.x , CurrentPosition.y) * BlockSize;
 
-        Quaternion angle = Quaternion.Euler(0, 0, -90 * CurrentOrientation.x);
-        if (CurrentOrientation.y == -1)
-            angle = Quaternion.Euler(0, 0, 180);
-
+        Quaternion angle = Quaternion.Euler(0, 0, DirectionToAngle(CurrentOrientation));
 
         GameObject block = Instantiate(TurnPrefab, pos, angle, transform);
         Circuit.Add(CurrentPosition, block);

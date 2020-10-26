@@ -10,6 +10,8 @@ public class CarController : MonoBehaviour
     public float SlowRotationSpeed;
     public float DriftFactor;
 
+    public Vector2 EffectivePosition { get; private set; } //The car's position in the circuit that takes bumper into account
+
     private Rigidbody2D Body;
     private Bumper Bumped = null;
 
@@ -29,6 +31,8 @@ public class CarController : MonoBehaviour
         //If mid-air, stop here
         if (Bumped != null)
             return;
+
+        EffectivePosition = transform.position;
 
         Vector2 Acceleration = transform.up * Time.fixedDeltaTime * AccelSpeed * Input.GetAxis("Vertical");
         bool AccelerationIsPositive = Vector2.Dot(Acceleration, Body.velocity) > 0;
@@ -79,6 +83,8 @@ public class CarController : MonoBehaviour
         float timer = Maxtime;
 
         gameObject.layer = LayerMask.NameToLayer("IgnorePhysics");
+
+        EffectivePosition = landingPos;
 
         while (timer > 0)
         {

@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public struct CircuitBlock
+public class CircuitBlock
 {
     public GameObject block;
     public Vector2Int GridPosition;
-    public Vector2Int Direction;
+    public CircuitBlock NextGridPosition;
+    public CircuitBlock PreviousGridPosition;
 }

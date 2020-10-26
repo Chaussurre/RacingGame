@@ -14,7 +14,7 @@ public class MapBuilder : MonoBehaviour
 
     public float BlockSize;
 
-    private Vector2Int CurrentPosition = Vector2Int.zero;
+    private Vector2Int CurrentPosition = -Vector2Int.up;
     private Vector2Int CurrentOrientation = Vector2Int.up;
 
     private readonly Dictionary<Vector2Int, CircuitBlock> Circuit = new Dictionary<Vector2Int, CircuitBlock>();
@@ -36,9 +36,41 @@ public class MapBuilder : MonoBehaviour
     private void Start()
     {
         Instance = this;
-        createStraight();
-        for (int i = 1; i < numberBlock; i++)
+        
+        for (int i = 0; i < numberBlock; i++)
             createBlock();
+    }
+
+    private void Update()
+    {
+        DistanceToEnd(PositionToGrid(GameManager.Instance.FindFirstPlayer().EffectivePosition));
+    }
+
+    public int DistanceToEnd(Vector2Int target, bool fromBegining = false) //How many circuit block between the start/the end of the circuit and target
+    { 
+        int count = 0;
+
+        CircuitBlock SearchBlock = Circuit[CurrentPosition];
+        if (fromBegining)
+            SearchBlock = Circuit[Vector2Int.zero];
+
+        while (SearchBlock != null && SearchBlock.GridPosition != target && count < 1000)
+        {
+            if((!fromBegining && SearchBlock == SearchBlock.PreviousGridPosition) || (fromBegining && SearchBlock == SearchBlock.NextGridPosition))
+            {
+                Debug.LogError("DistanceToEnd : Loop at : " + SearchBlock.GridPosition);
+                break;
+            }
+
+            if (fromBegining)
+                SearchBlock = SearchBlock.NextGridPosition;
+            else
+                SearchBlock = SearchBlock.PreviousGridPosition;
+            count++;
+        }
+
+        Debug.Log("DistanceToEnd : Searching for position : " + target + " Found position : " + SearchBlock.GridPosition + " in " + count + " steps");
+        return count;
     }
 
     public bool CheckBlock(Vector2Int pos) // return true if there is a circuit block at specified coordinates
@@ -48,8 +80,14 @@ public class MapBuilder : MonoBehaviour
 
     void createBlock()
     {
-        int choice = Random.Range(0, 3);
+        Vector2Int PreviousPosition = CurrentPosition;
+        CurrentPosition += CurrentOrientation;
+        Debug.Log("createBlock : creating at " + CurrentPosition);
+
         CircuitBlock circuitBlock = new CircuitBlock();
+
+
+        int choice = Random.Range(0, 3);
         switch(choice)
         {
             case 0:
@@ -63,11 +101,19 @@ public class MapBuilder : MonoBehaviour
                 break;
         }
 
-        circuitBlock.GridPosition = CurrentPosition;
-        circuitBlock.Direction = CurrentOrientation;
-        Circuit.Add(CurrentPosition, circuitBlock);
+        if (Circuit.TryGetValue(PreviousPosition, out CircuitBlock previous))
+        {
+            previous.NextGridPosition = circuitBlock;
+            circuitBlock.PreviousGridPosition = previous;
+        }
+        else
+        {
+            Debug.Log("createBlock : no previous block at " + PreviousPosition);
+            circuitBlock.PreviousGridPosition = null;
+        }
 
-        CurrentPosition += CurrentOrientation;
+        circuitBlock.GridPosition = CurrentPosition;
+        Circuit.Add(CurrentPosition, circuitBlock);
     }
     GameObject createStraight()
     {

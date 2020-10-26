@@ -21,4 +21,9 @@ public class GameManager : MonoBehaviour
     {
         return Players[0]; //FIXME
     }
+
+    public CarController FindLastPlayer()
+    {
+        return Players[0]; //FIXME
+    }
 }

@@ -7,14 +7,17 @@ public class MapBuilder : MonoBehaviour
     public static MapBuilder Instance;
 
     public int numberBlockAdvance; //number of blocks generated in front of 1st player
+    public int numberBlockBehind; //number of blocks kept behind last player
 
     public GameObject StraightLinePrefab;
     public GameObject TurnPrefab;
     public Bumper BumperPrefab;
+    public GameObject Blocker;
 
     public float BlockSize;
 
     private Vector2Int CurrentPosition = -Vector2Int.up;
+    private CircuitBlock LastBlock = null;
     private Vector2Int CurrentOrientation = Vector2Int.up;
 
     private readonly Dictionary<Vector2Int, CircuitBlock> Circuit = new Dictionary<Vector2Int, CircuitBlock>();
@@ -36,14 +39,20 @@ public class MapBuilder : MonoBehaviour
     private void Start()
     {
         Instance = this;
-        createBlock();
+        CreateBlock();
     }
 
     private void Update()
     {
         int dist = DistanceToEnd(PositionToGrid(GameManager.Instance.FindFirstPlayer().EffectivePosition));
-        for (int i = dist; i < numberBlockAdvance; i++)
-            createBlock();
+        if (dist != -1)
+            for (int i = dist; i < numberBlockAdvance; i++)
+                CreateBlock();
+
+        dist = DistanceToEnd(PositionToGrid(GameManager.Instance.FindLastPlayer().EffectivePosition), true);
+        if (dist != -1)
+            for (int i = dist; i > numberBlockBehind; i--)
+                DestroyBlock();
     }
 
     public int DistanceToEnd(Vector2Int target, bool fromBegining = false) //How many circuit block between the start/the end of the circuit and target
@@ -52,25 +61,29 @@ public class MapBuilder : MonoBehaviour
 
         CircuitBlock SearchBlock = Circuit[CurrentPosition];
         if (fromBegining)
-            SearchBlock = Circuit[Vector2Int.zero];
+            SearchBlock = LastBlock;
 
         while (SearchBlock != null && SearchBlock.GridPosition != target && count < 1000)
         {
-            if((!fromBegining && SearchBlock == SearchBlock.PreviousGridPosition) || (fromBegining && SearchBlock == SearchBlock.NextGridPosition))
+            if((!fromBegining && SearchBlock == SearchBlock.PreviousBlock) || (fromBegining && SearchBlock == SearchBlock.NextBlock))
             {
                 Debug.LogError("DistanceToEnd : Loop at : " + SearchBlock.GridPosition);
                 break;
             }
 
             if (fromBegining)
-                SearchBlock = SearchBlock.NextGridPosition;
+                SearchBlock = SearchBlock.NextBlock;
             else
-                SearchBlock = SearchBlock.PreviousGridPosition;
+                SearchBlock = SearchBlock.PreviousBlock;
             count++;
         }
 
-        Debug.Log("DistanceToEnd : Searching for position : " + target + " Found position : " + SearchBlock.GridPosition + " in " + count + " steps");
-        return count;
+        if (SearchBlock != null)
+        {
+            Debug.Log("DistanceToEnd : Searching for position : " + target + " Found position : " + SearchBlock.GridPosition + " in " + count + " steps");
+            return count;
+        }
+        return -1;
     }
 
     public bool CheckBlock(Vector2Int pos) // return true if there is a circuit block at specified coordinates
@@ -78,7 +91,7 @@ public class MapBuilder : MonoBehaviour
         return Circuit.ContainsKey(pos);
     }
 
-    void createBlock()
+    void CreateBlock()
     {
         Vector2Int PreviousPosition = CurrentPosition;
         CurrentPosition += CurrentOrientation;
@@ -91,31 +104,58 @@ public class MapBuilder : MonoBehaviour
         switch(choice)
         {
             case 0:
-                circuitBlock.block = createStraight();
+                circuitBlock.block = CreateStraight();
                 break;
             case 1:
-                circuitBlock.block = createTurn(true);
+                circuitBlock.block = CreateTurn(true);
                 break;
             case 2:
-                circuitBlock.block = createTurn(false);
+                circuitBlock.block = CreateTurn(false);
                 break;
         }
 
         if (Circuit.TryGetValue(PreviousPosition, out CircuitBlock previous))
         {
-            previous.NextGridPosition = circuitBlock;
-            circuitBlock.PreviousGridPosition = previous;
+            previous.NextBlock = circuitBlock;
+            circuitBlock.PreviousBlock = previous;
         }
         else
         {
             Debug.Log("createBlock : no previous block at " + PreviousPosition);
-            circuitBlock.PreviousGridPosition = null;
+            circuitBlock.PreviousBlock = null;
         }
 
         circuitBlock.GridPosition = CurrentPosition;
         Circuit.Add(CurrentPosition, circuitBlock);
+
+        if (LastBlock == null)
+            LastBlock = circuitBlock;
     }
-    GameObject createStraight()
+
+    void DestroyBlock()
+    {
+        CircuitBlock destroyed = LastBlock;
+        LastBlock = destroyed.NextBlock;
+        Destroy(destroyed.block);
+
+        Blocker.transform.position = LastBlock.block.transform.position;
+        Vector2 Direction = LastBlock.GridPosition - destroyed.GridPosition;
+        Vector2Int DirectionInt = new Vector2Int(Mathf.RoundToInt(Direction.x), Mathf.RoundToInt(Direction.y));
+        Blocker.transform.rotation = Quaternion.Euler(0, 0, DirectionToAngle(DirectionInt));
+        
+        Circuit.Remove(destroyed.GridPosition);
+
+        if (Bumpers.TryGetValue(destroyed.GridPosition, out Bumper bumper))
+        {
+            Bumpers.Remove(destroyed.GridPosition);
+            Destroy(bumper.gameObject);
+        }
+
+        LastBlock.PreviousBlock = null;
+        destroyed.NextBlock = null;
+
+    }
+    GameObject CreateStraight()
     {
         if (CheckBlock(CurrentPosition)) //Trying to override an existing block
             CreateBumper();
@@ -128,12 +168,12 @@ public class MapBuilder : MonoBehaviour
         return block;
     }
 
-    GameObject createTurn(bool ToLeft)
+    GameObject CreateTurn(bool ToLeft)
     {
         if (CheckBlock(CurrentPosition)) //Trying to override an existing block
         {
             CreateBumper();
-            return createStraight(); //No turning block right after a bump
+            return CreateStraight(); //No turning block right after a bump
         }
 
         Vector2 pos = new Vector2(CurrentPosition.x , CurrentPosition.y) * BlockSize;

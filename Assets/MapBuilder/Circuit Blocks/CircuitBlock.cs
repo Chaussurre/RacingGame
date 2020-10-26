@@ -6,6 +6,6 @@ public class CircuitBlock
 {
     public GameObject block;
     public Vector2Int GridPosition;
-    public CircuitBlock NextGridPosition;
-    public CircuitBlock PreviousGridPosition;
+    public CircuitBlock NextBlock;
+    public CircuitBlock PreviousBlock;
 }

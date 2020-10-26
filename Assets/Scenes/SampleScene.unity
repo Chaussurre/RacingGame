@@ -422,7 +422,12 @@ PrefabInstance:
     - target: {fileID: 3080955056907083597, guid: 3834801ab53814a4aae003de4340262e,
         type: 3}
       propertyPath: numberBlockAdvance
-      value: 1
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3080955056907083597, guid: 3834801ab53814a4aae003de4340262e,
+        type: 3}
+      propertyPath: numberBlockBehind
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3834801ab53814a4aae003de4340262e, type: 3}

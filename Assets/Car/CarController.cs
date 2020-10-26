@@ -7,10 +7,13 @@ public class CarController : MonoBehaviour
     public float SpeedMax;
     public float AccelSpeed;
     public float RotationSpeed;
+    public float SlowRotationSpeed;
     public float DriftFactor;
 
     private Rigidbody2D Body;
     private Bumper Bumped = null;
+
+    Vector2 PreviousSpeed;
 
     float Speed = 0;
     void Start()
@@ -18,20 +21,23 @@ public class CarController : MonoBehaviour
         Body = GetComponent<Rigidbody2D>();
     }
 
-
-
     // Update is called once per frame
     void FixedUpdate()
     {
+        PreviousSpeed = Body.velocity;
+
         //If mid-air, stop here
         if (Bumped != null)
             return;
 
         Vector2 Acceleration = transform.up * Time.fixedDeltaTime * AccelSpeed * Input.GetAxis("Vertical");
-        float Rotation = Speed * RotationSpeed * Time.fixedDeltaTime * RotationSpeed * Input.GetAxis("Horizontal");
         bool AccelerationIsPositive = Vector2.Dot(Acceleration, Body.velocity) > 0;
 
         //rotate
+        float RotationSpeed = this.RotationSpeed;
+        if (Body.velocity.magnitude < 4)
+            RotationSpeed = SlowRotationSpeed;
+        float Rotation = Speed * RotationSpeed * Time.fixedDeltaTime * RotationSpeed * Input.GetAxis("Horizontal");
         Body.MoveRotation(Body.rotation - Rotation);
 
         //If speed is less than speedMax, accelerate the car
@@ -52,13 +58,6 @@ public class CarController : MonoBehaviour
         Vector3 DriftSpeed = new Vector3(Body.velocity.x, Body.velocity.y) - (transform.up * Speed);
         Body.velocity = transform.up * Speed + (DriftSpeed * DriftFactor);
     }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.transform.parent != null && collision.transform.parent.TryGetComponent(out Bumper bumper))
-            Bump(bumper);
-    }
-
     void Bump(Bumper bumper)
     {
         if (Bumped != null)
@@ -92,5 +91,22 @@ public class CarController : MonoBehaviour
         Body.velocity = (Vector2.zero + Bumped.Direction) * SpeedMax;
         gameObject.layer = LayerMask.NameToLayer("Default");
         Bumped = null;
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.transform.parent != null && collision.transform.parent.TryGetComponent(out Bumper bumper))
+            Bump(bumper);
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        Vector2 CollisionNormal = collision.contacts[0].normal;
+        float CollisionAngle = Mathf.Abs(Vector2.Angle(PreviousSpeed, CollisionNormal));
+
+        if (CollisionAngle > 130) //Orthogonal collision, number found from observation
+            Body.velocity = -.8f * PreviousSpeed;
+
+
     }
 }

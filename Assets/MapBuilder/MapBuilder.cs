@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MapBuilder : MonoBehaviour
 {
-    public static MapBuilder instance;
+    public static MapBuilder Instance;
 
     public int numberBlock;
 
@@ -17,7 +17,7 @@ public class MapBuilder : MonoBehaviour
     private Vector2Int CurrentPosition = Vector2Int.zero;
     private Vector2Int CurrentOrientation = Vector2Int.up;
 
-    private readonly Dictionary<Vector2Int, GameObject> Circuit = new Dictionary<Vector2Int, GameObject>();
+    private readonly Dictionary<Vector2Int, CircuitBlock> Circuit = new Dictionary<Vector2Int, CircuitBlock>();
     private readonly Dictionary<Vector2Int, Bumper> Bumpers = new Dictionary<Vector2Int, Bumper>();
 
     public static float DirectionToAngle(Vector2Int Direction)
@@ -28,10 +28,14 @@ public class MapBuilder : MonoBehaviour
 
         return angle;
     }
+    public Vector2Int PositionToGrid(Vector2 Position)
+    {
+        return new Vector2Int(Mathf.RoundToInt(Position.x / BlockSize), Mathf.RoundToInt(Position.y / BlockSize));
+    }
 
     private void Start()
     {
-        instance = this;
+        Instance = this;
         createStraight();
         for (int i = 1; i < numberBlock; i++)
             createBlock();
@@ -45,20 +49,27 @@ public class MapBuilder : MonoBehaviour
     void createBlock()
     {
         int choice = Random.Range(0, 3);
+        CircuitBlock circuitBlock = new CircuitBlock();
         switch(choice)
         {
             case 0:
-                createStraight();
-                return;
+                circuitBlock.block = createStraight();
+                break;
             case 1:
-                createTurn(true);
-                return;
+                circuitBlock.block = createTurn(true);
+                break;
             case 2:
-                createTurn(false);
-                return;
+                circuitBlock.block = createTurn(false);
+                break;
         }
+
+        circuitBlock.GridPosition = CurrentPosition;
+        circuitBlock.Direction = CurrentOrientation;
+        Circuit.Add(CurrentPosition, circuitBlock);
+
+        CurrentPosition += CurrentOrientation;
     }
-    void createStraight()
+    GameObject createStraight()
     {
         if (CheckBlock(CurrentPosition)) //Trying to override an existing block
             CreateBumper();
@@ -68,17 +79,15 @@ public class MapBuilder : MonoBehaviour
         Quaternion angle = Quaternion.Euler(0, 0, 90 * CurrentOrientation.x);
 
         GameObject block = Instantiate(StraightLinePrefab, pos, angle, transform);
-        Circuit.Add(CurrentPosition, block);
-        CurrentPosition += CurrentOrientation;
+        return block;
     }
 
-    void createTurn(bool ToLeft)
+    GameObject createTurn(bool ToLeft)
     {
         if (CheckBlock(CurrentPosition)) //Trying to override an existing block
         {
             CreateBumper();
-            createStraight(); //No turning block right after a bump
-            return;
+            return createStraight(); //No turning block right after a bump
         }
 
         Vector2 pos = new Vector2(CurrentPosition.x , CurrentPosition.y) * BlockSize;
@@ -86,7 +95,6 @@ public class MapBuilder : MonoBehaviour
         Quaternion angle = Quaternion.Euler(0, 0, DirectionToAngle(CurrentOrientation));
 
         GameObject block = Instantiate(TurnPrefab, pos, angle, transform);
-        Circuit.Add(CurrentPosition, block);
         if (!ToLeft) //Flip the turn on the horizontal Axis if the turn is to the right;
         {
             Vector3 scale = block.transform.localScale;
@@ -98,7 +106,7 @@ public class MapBuilder : MonoBehaviour
             CurrentOrientation = new Vector2Int(-CurrentOrientation.y, CurrentOrientation.x);
         else
             CurrentOrientation = new Vector2Int(CurrentOrientation.y, -CurrentOrientation.x);
-        CurrentPosition += CurrentOrientation;
+        return block;
     }
 
     void CreateBumper()

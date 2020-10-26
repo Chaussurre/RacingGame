@@ -65,7 +65,7 @@ public class CarController : MonoBehaviour
 
         Bumped = bumper;
         Vector2 landingPosition = new Vector2(transform.position.x, transform.position.y) + 
-            (Vector2.zero + bumper.StopingPoint - bumper.StartingPoint) * MapBuilder.instance.BlockSize;
+            (Vector2.zero + bumper.StopingPoint - bumper.StartingPoint) * MapBuilder.Instance.BlockSize;
 
         transform.rotation = Quaternion.Euler(0, 0, MapBuilder.DirectionToAngle(bumper.Direction));
 

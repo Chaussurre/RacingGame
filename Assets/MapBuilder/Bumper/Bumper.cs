@@ -19,7 +19,7 @@ public class Bumper : MonoBehaviour
         this.StartingPoint = StartingPoint;
         StopingPoint = StartingPoint;
         this.Direction = Direction;
-        Vector2 pos = new Vector2(StartingPoint.x, StartingPoint.y) * MapBuilder.instance.BlockSize;
+        Vector2 pos = new Vector2(StartingPoint.x, StartingPoint.y) * MapBuilder.Instance.BlockSize;
 
         Quaternion angle = Quaternion.Euler(0, 0, -90 * Direction.x);
         if (Direction.y == -1)
@@ -30,11 +30,11 @@ public class Bumper : MonoBehaviour
         this.BumperUp = BumperUp;
 
         //Find arriving position
-        while (MapBuilder.instance.CheckBlock(StopingPoint))
+        while (MapBuilder.Instance.CheckBlock(StopingPoint))
             StopingPoint += Direction;
 
         //Create arriving point
-        pos = (new Vector2(StopingPoint.x, StopingPoint.y) - Direction) * MapBuilder.instance.BlockSize;
+        pos = (new Vector2(StopingPoint.x, StopingPoint.y) - Direction) * MapBuilder.Instance.BlockSize;
 
         GameObject BumperDown = Instantiate(BumperDownPrefab, pos, angle, transform);
         this.BumperDown = BumperDown;

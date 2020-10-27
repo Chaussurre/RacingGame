@@ -26,7 +26,7 @@ public class CarController : MonoBehaviour
 
     Vector2 PreviousSpeed;
 
-    float Speed = 0;
+    float SpeedForward = 0;
     void Start()
     {
         Body = GetComponent<Rigidbody2D>();
@@ -59,7 +59,7 @@ public class CarController : MonoBehaviour
         float RotationSpeed = this.RotationSpeed;
         if (Body.velocity.magnitude < 4)
             RotationSpeed = SlowRotationSpeed;
-        float Rotation = Speed * RotationSpeed * Time.fixedDeltaTime * RotationSpeed * Input.GetAxis("Horizontal");
+        float Rotation = SpeedForward * RotationSpeed * Time.fixedDeltaTime * RotationSpeed * Input.GetAxis("Horizontal");
         Body.MoveRotation(Body.rotation - Rotation);
 
     }
@@ -78,12 +78,12 @@ public class CarController : MonoBehaviour
         Vector2 Acceleration = transform.up * Time.fixedDeltaTime * EffectiveAccelSpeed * Input.GetAxis("Vertical");
         bool AccelerationIsPositive = Vector2.Dot(Acceleration, Body.velocity) > 0;
         //If speed is less than speedMax, accelerate the car
-        if ((Speed >= 0 && (Speed < EffectiveSpeedMax || !AccelerationIsPositive)) ||
-            (Speed <= 0 && (Speed > -EffectiveSpeedMax || !AccelerationIsPositive)))
+        if ((SpeedForward >= 0 && (SpeedForward < EffectiveSpeedMax || !AccelerationIsPositive)) ||
+            (SpeedForward <= 0 && (SpeedForward > -EffectiveSpeedMax || !AccelerationIsPositive)))
             Body.AddForce(Acceleration);
 
         //Natural Deceleration
-        if (Acceleration.magnitude < 0.1 || !AccelerationIsPositive || Speed > EffectiveSpeedMax)
+        if (Acceleration.magnitude < 0.1 || !AccelerationIsPositive || SpeedForward > EffectiveSpeedMax)
             Deccelerate();
     }
 
@@ -94,9 +94,23 @@ public class CarController : MonoBehaviour
 
    void Drift()
     {
-        Speed = Vector2.Dot(Body.velocity, transform.up);
-        Vector2 DriftSpeed = new Vector3(Body.velocity.x, Body.velocity.y) - (transform.up * Speed);
-        Body.velocity -= DriftSpeed * (1 - MinDriftFactor) * 10 * Time.fixedDeltaTime;
+        SpeedForward = Vector2.Dot(Body.velocity, transform.up);
+
+        float Speed = Body.velocity.magnitude;
+        float driftFactor = MinDriftFactor;
+        if (Speed > SpeedMax)
+        {
+            if (Speed >= TurboSpeedMax)
+                driftFactor = MaxDriftFactor;
+            else
+            {
+                float ratio = (Speed - SpeedMax) / (TurboSpeedMax - SpeedMax);
+                driftFactor = ratio * (MaxDriftFactor - MinDriftFactor) + MinDriftFactor;
+            }
+        }
+
+        Vector2 DriftSpeed = new Vector3(Body.velocity.x, Body.velocity.y) - (transform.up * SpeedForward);
+        Body.velocity -= DriftSpeed * (1 - driftFactor) * 10 * Time.fixedDeltaTime;
     }
     void Bump(Bumper bumper)
     {
@@ -104,8 +118,8 @@ public class CarController : MonoBehaviour
             return;
 
         Bumped = bumper;
-        Vector2 landingPosition = new Vector2(transform.position.x, transform.position.y) + 
-            (Vector2.zero + bumper.StopingPoint - bumper.StartingPoint) * MapBuilder.Instance.BlockSize;
+        Vector2 BumperDist = (Vector2.zero + bumper.StopingPoint - bumper.StartingPoint) * MapBuilder.Instance.BlockSize;
+        Vector2 landingPosition = new Vector2(transform.position.x, transform.position.y) + BumperDist + (Vector2.zero + bumper.Direction) * 0.2f;
 
         transform.rotation = Quaternion.Euler(0, 0, MapBuilder.DirectionToAngle(bumper.Direction));
 

@@ -7,6 +7,9 @@ public class GameManager : MonoBehaviour
     [HideInInspector]
     public readonly List<CarController> Players = new List<CarController>();
 
+    [SerializeField]
+    private PositionLine PositionLine;
+
     public static GameManager Instance;
 
     // Start is called before the first frame update
@@ -15,6 +18,8 @@ public class GameManager : MonoBehaviour
         Instance = this;
         Players.AddRange(FindObjectsOfType<CarController>());
         Debug.Log("Found " + Players.Count + " players!");
+
+        PositionLine.SetFollowedCar(Players[0]); //FIXME
     }
 
     public CarController FindFirstPlayer()

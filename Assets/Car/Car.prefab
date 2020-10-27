@@ -33,6 +33,7 @@ Transform:
   m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_Children:
   - {fileID: 983178982621425263}
+  - {fileID: 6688134736948487016}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -125,7 +126,8 @@ MonoBehaviour:
   RotationSpeed: 5
   SlowRotationSpeed: 8
   DriftFactor: 0.7
-  color: {r: 0.6117647, g: 0, b: 0, a: 1}
+  color: {r: 0.13333334, g: 0.23137257, b: 0.32941177, a: 1}
+  CarFont: {fileID: 6688134736948487016}
   ColorCarRenderer: {fileID: 1241991261700166620}
 --- !u!70 &5384530024722022712
 CapsuleCollider2D:
@@ -169,6 +171,36 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.453125, y: 0.6585921}
   m_EdgeRadius: 0
+--- !u!1 &6609339930951707874
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6688134736948487016}
+  m_Layer: 0
+  m_Name: CarFront
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6688134736948487016
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6609339930951707874}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.4375, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 2172717915234726011}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7297430953584491591
 GameObject:
   m_ObjectHideFlags: 0

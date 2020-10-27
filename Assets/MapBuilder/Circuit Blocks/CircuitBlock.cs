@@ -26,7 +26,7 @@ public class CircuitBlock : MonoBehaviour
 
         float progress = Vector2.Dot(relativPos, Orientation);
         Vector2 projection = (Vector2.zero + Orientation) * progress;
-        Normal = new Vector2(Orientation.y, Orientation.x);
+        Normal = Vector2.Perpendicular(projection);
 
         return progress;
     }

@@ -15,9 +15,11 @@ public class CarController : MonoBehaviour
     public Vector2 EffectivePosition { get; private set; } //The car's position in the circuit that takes bumper into account
 
     [SerializeField]
+    private Transform CarFont;
+    [SerializeField]
     private SpriteRenderer ColorCarRenderer;
     private Rigidbody2D Body;
-    private Bumper Bumped = null;
+    public Bumper Bumped { get; private set; } = null;
 
     Vector2 PreviousSpeed;
 
@@ -28,23 +30,20 @@ public class CarController : MonoBehaviour
         ColorCarRenderer.color = color;
     }
 
+    private void Update()
+    {
+        if (Bumped == null)
+            EffectivePosition = CarFont.position;
+    }
+
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (MapBuilder.Instance.Circuit.TryGetValue(MapBuilder.Instance.PositionToGrid(EffectivePosition), out CircuitBlock block))
-        {
-            block.GetProgress(EffectivePosition, out Vector2 Normal);
-            Debug.Log("Drawing ray : " + Normal);
-            Debug.DrawRay(EffectivePosition, Normal, Color.red);
-        }
-
         PreviousSpeed = Body.velocity;
 
         //If mid-air, stop here
         if (Bumped != null)
             return;
-
-        EffectivePosition = transform.position;
 
         Vector2 Acceleration = transform.up * Time.fixedDeltaTime * AccelSpeed * Input.GetAxis("Vertical");
         bool AccelerationIsPositive = Vector2.Dot(Acceleration, Body.velocity) > 0;
@@ -63,7 +62,7 @@ public class CarController : MonoBehaviour
 
         //Natural Deceleration
         if (Acceleration.magnitude < 0.1 || !AccelerationIsPositive)
-            Body.velocity = Body.velocity * 0.95f;
+            Body.velocity *= 0.95f;
 
         Drift();
     }

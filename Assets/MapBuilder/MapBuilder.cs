@@ -16,6 +16,7 @@ public class MapBuilder : MonoBehaviour
 
     public float BlockSize;
 
+    private MiniMap miniMap;
     private Vector2Int CurrentPosition = -Vector2Int.up;
     private CircuitBlock LastBlock = null;
     private Vector2Int CurrentOrientation = Vector2Int.up;
@@ -36,9 +37,10 @@ public class MapBuilder : MonoBehaviour
         return new Vector2Int(Mathf.RoundToInt(Position.x / BlockSize), Mathf.RoundToInt(Position.y / BlockSize));
     }
 
-    private void Start()
+    private void Awake()
     {
         Instance = this;
+        miniMap = FindObjectOfType<MiniMap>();
         CreateSection();
     }
 
@@ -122,6 +124,7 @@ public class MapBuilder : MonoBehaviour
         }
 
         Circuit.Add(CurrentPosition, circuitBlock);
+        miniMap.CreateBlock(circuitBlock);
 
         if (LastBlock == null)
             LastBlock = circuitBlock;
@@ -160,6 +163,8 @@ public class MapBuilder : MonoBehaviour
         }
 
         LastBlock.PreviousBlock = null;
+
+        miniMap.DestroyBlock(destroyed);
         Destroy(destroyed.gameObject);
     }
     CircuitBlock CreateStraight()

@@ -44,8 +44,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5ff3694d392bec4eb80a11bb453a1f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  numberBlockAdvance: 5
-  numberBlockBehind: 5
+  numberBlockAdvance: 20
+  numberBlockBehind: 20
   StraightLinePrefab: {fileID: -4932092860563911818, guid: 709942a6f5a2b7d45897c064a7cf95ac,
     type: 3}
   TurnPrefab: {fileID: -7199571914526733392, guid: 7c972b4c977a56c4094ae2e0338928fa,

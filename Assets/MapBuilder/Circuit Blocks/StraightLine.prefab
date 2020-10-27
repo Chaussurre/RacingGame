@@ -149,5 +149,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34778dcc797bfc242974e0f4fc35e089, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MiniMapVersion: {fileID: 8322260836769106204, guid: 9f38ea00032dee540be42befa0cf5e00,
+    type: 3}
   NextBlock: {fileID: 0}
   PreviousBlock: {fileID: 0}

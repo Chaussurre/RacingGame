@@ -204,6 +204,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1354545e42c52674d91275250456029c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MiniMapVersion: {fileID: 7994053527234494942, guid: f5e278f29def71c47aa6af2d8acc1b16,
+    type: 3}
   NextBlock: {fileID: 0}
   PreviousBlock: {fileID: 0}
   origin: {fileID: 6760177027374958709}

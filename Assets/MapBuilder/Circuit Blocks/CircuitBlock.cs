@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class CircuitBlock : MonoBehaviour
 {
+    public GameObject MiniMapVersion;
+
     public Vector2Int GridPosition { get; private set; }
     public Vector2Int Orientation { get; private set; }
     [HideInInspector]

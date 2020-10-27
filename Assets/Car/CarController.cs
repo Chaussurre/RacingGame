@@ -45,16 +45,26 @@ public class CarController : MonoBehaviour
         if (Bumped != null)
             return;
 
-        Vector2 Acceleration = transform.up * Time.fixedDeltaTime * AccelSpeed * Input.GetAxis("Vertical");
-        bool AccelerationIsPositive = Vector2.Dot(Acceleration, Body.velocity) > 0;
 
-        //rotate
+        Rotate();
+        Accelerate();
+        Drift();
+    }
+
+    void Rotate()
+    {
         float RotationSpeed = this.RotationSpeed;
         if (Body.velocity.magnitude < 4)
             RotationSpeed = SlowRotationSpeed;
         float Rotation = Speed * RotationSpeed * Time.fixedDeltaTime * RotationSpeed * Input.GetAxis("Horizontal");
         Body.MoveRotation(Body.rotation - Rotation);
 
+    }
+
+    void Accelerate()
+    { 
+        Vector2 Acceleration = transform.up * Time.fixedDeltaTime * AccelSpeed * Input.GetAxis("Vertical");
+        bool AccelerationIsPositive = Vector2.Dot(Acceleration, Body.velocity) > 0;
         //If speed is less than speedMax, accelerate the car
         if ((Speed >= 0 && (Speed < SpeedMax || !AccelerationIsPositive)) ||
             (Speed <= 0 && (Speed > -SpeedMax || !AccelerationIsPositive)))
@@ -64,7 +74,6 @@ public class CarController : MonoBehaviour
         if (Acceleration.magnitude < 0.1 || !AccelerationIsPositive)
             Body.velocity *= 0.95f;
 
-        Drift();
     }
 
    void Drift()

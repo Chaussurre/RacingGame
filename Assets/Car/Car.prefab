@@ -122,10 +122,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SpeedMax: 8
+  TurboSpeedMax: 15
   AccelSpeed: 500
+  TurboAccelSpeed: 700
   RotationSpeed: 5
   SlowRotationSpeed: 8
-  DriftFactor: 0.7
+  MinDriftFactor: 0.7
+  MaxDriftFactor: 0.7
   color: {r: 0.13333334, g: 0.23137257, b: 0.32941177, a: 1}
   CarFont: {fileID: 6688134736948487016}
   ColorCarRenderer: {fileID: 1241991261700166620}

@@ -5,10 +5,13 @@ using UnityEngine;
 public class CarController : MonoBehaviour
 {
     public float SpeedMax;
+    public float TurboSpeedMax;
     public float AccelSpeed;
+    public float TurboAccelSpeed;
     public float RotationSpeed;
     public float SlowRotationSpeed;
-    public float DriftFactor;
+    public float MinDriftFactor;
+    public float MaxDriftFactor;
 
     public Color color;
 
@@ -62,25 +65,38 @@ public class CarController : MonoBehaviour
     }
 
     void Accelerate()
-    { 
-        Vector2 Acceleration = transform.up * Time.fixedDeltaTime * AccelSpeed * Input.GetAxis("Vertical");
+    {
+        float EffectiveAccelSpeed = AccelSpeed;
+        float EffectiveSpeedMax = SpeedMax;
+
+        if(Input.GetAxisRaw("Turbo") > 0)
+        {
+            EffectiveAccelSpeed = TurboAccelSpeed;
+            EffectiveSpeedMax = TurboSpeedMax;
+        }
+
+        Vector2 Acceleration = transform.up * Time.fixedDeltaTime * EffectiveAccelSpeed * Input.GetAxis("Vertical");
         bool AccelerationIsPositive = Vector2.Dot(Acceleration, Body.velocity) > 0;
         //If speed is less than speedMax, accelerate the car
-        if ((Speed >= 0 && (Speed < SpeedMax || !AccelerationIsPositive)) ||
-            (Speed <= 0 && (Speed > -SpeedMax || !AccelerationIsPositive)))
+        if ((Speed >= 0 && (Speed < EffectiveSpeedMax || !AccelerationIsPositive)) ||
+            (Speed <= 0 && (Speed > -EffectiveSpeedMax || !AccelerationIsPositive)))
             Body.AddForce(Acceleration);
 
         //Natural Deceleration
-        if (Acceleration.magnitude < 0.1 || !AccelerationIsPositive)
-            Body.velocity *= 0.95f;
+        if (Acceleration.magnitude < 0.1 || !AccelerationIsPositive || Speed > EffectiveSpeedMax)
+            Deccelerate();
+    }
 
+    void Deccelerate()
+    {
+        Body.velocity *= 0.95f;
     }
 
    void Drift()
     {
         Speed = Vector2.Dot(Body.velocity, transform.up);
         Vector3 DriftSpeed = new Vector3(Body.velocity.x, Body.velocity.y) - (transform.up * Speed);
-        Body.velocity = transform.up * Speed + (DriftSpeed * DriftFactor);
+        Body.velocity = transform.up * Speed + (DriftSpeed * MinDriftFactor);
     }
     void Bump(Bumper bumper)
     {

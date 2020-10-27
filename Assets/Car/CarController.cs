@@ -95,8 +95,8 @@ public class CarController : MonoBehaviour
    void Drift()
     {
         Speed = Vector2.Dot(Body.velocity, transform.up);
-        Vector3 DriftSpeed = new Vector3(Body.velocity.x, Body.velocity.y) - (transform.up * Speed);
-        Body.velocity = transform.up * Speed + (DriftSpeed * MinDriftFactor);
+        Vector2 DriftSpeed = new Vector3(Body.velocity.x, Body.velocity.y) - (transform.up * Speed);
+        Body.velocity -= DriftSpeed * (1 - MinDriftFactor) * 10 * Time.fixedDeltaTime;
     }
     void Bump(Bumper bumper)
     {

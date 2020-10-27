@@ -4,10 +4,15 @@ using UnityEngine;
 
 public class CameraFollowCar : MonoBehaviour
 {
-    public CarController MainCar;
+    private CarController Followed;
     void Update()
     {
-        if (MainCar != null)
-            transform.position = MainCar.transform.position - Vector3.forward * 10;
+        if (Followed != null)
+            transform.position = Followed.transform.position - Vector3.forward * 10;
+    }
+
+    public void SetFollowed(CarController Followed)
+    {
+        this.Followed = Followed;
     }
 }

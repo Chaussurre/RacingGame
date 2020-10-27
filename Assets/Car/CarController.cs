@@ -22,6 +22,7 @@ public class CarController : MonoBehaviour
     [SerializeField]
     private SpriteRenderer ColorCarRenderer;
     private Rigidbody2D Body;
+    private CarControllerInput ControllerInput;
     public Bumper Bumped { get; private set; } = null;
 
     Vector2 PreviousSpeed;
@@ -30,6 +31,7 @@ public class CarController : MonoBehaviour
     void Start()
     {
         Body = GetComponent<Rigidbody2D>();
+        ControllerInput = GetComponentInChildren<CarControllerInput>();
         ColorCarRenderer.color = color;
     }
 
@@ -48,34 +50,34 @@ public class CarController : MonoBehaviour
         if (Bumped != null)
             return;
 
-
-        Rotate();
-        Accelerate();
+        ControlInputData inputData = ControllerInput.GetInput();
+        Rotate(inputData);
+        Accelerate(inputData);
         Drift();
     }
 
-    void Rotate()
+    void Rotate(ControlInputData inputData)
     {
         float RotationSpeed = this.RotationSpeed;
         if (Body.velocity.magnitude < 4)
             RotationSpeed = SlowRotationSpeed;
-        float Rotation = SpeedForward * RotationSpeed * Time.fixedDeltaTime * RotationSpeed * Input.GetAxis("Horizontal");
+        float Rotation = SpeedForward * RotationSpeed * Time.fixedDeltaTime * RotationSpeed * inputData.Horizontal;
         Body.MoveRotation(Body.rotation - Rotation);
 
     }
 
-    void Accelerate()
+    void Accelerate(ControlInputData inputData)
     {
         float EffectiveAccelSpeed = AccelSpeed;
         float EffectiveSpeedMax = SpeedMax;
 
-        if(Input.GetAxisRaw("Turbo") > 0)
+        if(inputData.Turbo)
         {
             EffectiveAccelSpeed = TurboAccelSpeed;
             EffectiveSpeedMax = TurboSpeedMax;
         }
 
-        Vector2 Acceleration = transform.up * Time.fixedDeltaTime * EffectiveAccelSpeed * Input.GetAxis("Vertical");
+        Vector2 Acceleration = transform.up * Time.fixedDeltaTime * EffectiveAccelSpeed * inputData.Forward;
         bool AccelerationIsPositive = Vector2.Dot(Acceleration, Body.velocity) > 0;
         //If speed is less than speedMax, accelerate the car
         if ((SpeedForward >= 0 && (SpeedForward < EffectiveSpeedMax || !AccelerationIsPositive)) ||
@@ -158,9 +160,9 @@ public class CarController : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         Vector2 CollisionNormal = collision.contacts[0].normal;
-        float CollisionAngle = Mathf.Abs(Vector2.Angle(PreviousSpeed, CollisionNormal));
+        float CollisionAngle = Mathf.Abs(Vector2.Angle(transform.up, CollisionNormal));
 
-        if (CollisionAngle > 130) //Orthogonal collision, number found from observation
+        if (CollisionAngle > 150) //Orthogonal collision, number found from observation
             Body.velocity = -.8f * PreviousSpeed;
 
 

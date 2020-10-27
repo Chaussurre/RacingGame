@@ -13,13 +13,12 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         Instance = this;
         Players.AddRange(FindObjectsOfType<CarController>());
         Debug.Log("Found " + Players.Count + " players!");
 
-        PositionLine.SetFollowedCar(Players[0]); //FIXME
     }
 
     public CarController FindFirstPlayer()
@@ -30,5 +29,16 @@ public class GameManager : MonoBehaviour
     public CarController FindLastPlayer()
     {
         return Players[0]; //FIXME
+    }
+
+    public void SetMainPlayer(CarController mainPlayer)
+    {
+        CameraFollowCar cameraFollow = Camera.main.GetComponent<CameraFollowCar>();
+        if (cameraFollow != null)
+            cameraFollow.SetFollowed(mainPlayer);
+
+        PositionLine.SetFollowedCar(mainPlayer); //FIXME
+
+        MapBuilder.Instance.miniMap.SetFollowedCar(mainPlayer);
     }
 }

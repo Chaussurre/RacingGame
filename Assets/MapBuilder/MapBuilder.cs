@@ -16,7 +16,7 @@ public class MapBuilder : MonoBehaviour
 
     public float BlockSize;
 
-    private MiniMap miniMap;
+    public MiniMap miniMap { get; private set; }
     private Vector2Int CurrentPosition = -Vector2Int.up;
     private CircuitBlock LastBlock = null;
     private Vector2Int CurrentOrientation = Vector2Int.up;

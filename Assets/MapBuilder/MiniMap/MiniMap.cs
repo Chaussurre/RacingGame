@@ -6,23 +6,37 @@ public class MiniMap : MonoBehaviour
 {
     public float BlockSize;
     public Transform MapDrawer;
-    public SpriteRenderer CarCursor;
+    public GameObject CarCursorPrefab;
 
     private readonly Dictionary<Vector2Int, GameObject> circuit = new Dictionary<Vector2Int, GameObject>();
+    private readonly Dictionary<CarController, GameObject> Cursors = new Dictionary<CarController, GameObject>();
 
     private CarController FollowedCar;
 
     private void Start()
     {
-        FollowedCar = FindObjectOfType<CarController>();
-        CarCursor.color = FollowedCar.color;
+        foreach(CarController car in GameManager.Instance.Players)
+        {
+            GameObject cursor = Instantiate(CarCursorPrefab, transform);
+            cursor.GetComponent<SpriteRenderer>().color = car.color;
+            Cursors.Add(car, cursor);
+        }
+    }
+
+    public void SetFollowedCar(CarController FollowedCar)
+    {
+        this.FollowedCar = FollowedCar;
     }
 
     private void LateUpdate()
     {
         float RealityToMapRatio = BlockSize / MapBuilder.Instance.BlockSize;
+        
+        if (FollowedCar != null)
         MapDrawer.localPosition = FollowedCar.EffectivePosition * -RealityToMapRatio;
-        CarCursor.transform.localPosition = FollowedCar.transform.position * RealityToMapRatio + MapDrawer.localPosition;
+
+        foreach (CarController car in GameManager.Instance.Players)
+            Cursors[car].transform.localPosition = car.transform.position * RealityToMapRatio + MapDrawer.localPosition;
     }
 
     public void CreateBlock(CircuitBlock block)

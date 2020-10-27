@@ -50,40 +50,25 @@ public class MapBuilder : MonoBehaviour
         if (dist != -1 && dist < numberBlockAdvance)
                 CreateSection();
 
-        dist = DistanceToEnd(PositionToGrid(GameManager.Instance.FindLastPlayer().EffectivePosition), true);
+        dist = DistanceToBegining(PositionToGrid(GameManager.Instance.FindLastPlayer().EffectivePosition));
         if (dist != -1)
             for (int i = dist; i > numberBlockBehind; i--)
                 DestroyBlock();
     }
 
-    public int DistanceToEnd(Vector2Int target, bool fromBegining = false) //How many circuit block between the start/the end of the circuit and target
+    public int DistanceToEnd(Vector2Int target) //How many circuit block between the start/the end of the circuit and target
     { 
-        int count = 0;
+        if (Circuit.TryGetValue(target, out CircuitBlock block))
+            return block.Order;
 
-        CircuitBlock SearchBlock = Circuit[CurrentPosition];
-        if (fromBegining)
-            SearchBlock = LastBlock;
+        return -1;
+    }
 
-        while (SearchBlock != null && SearchBlock.GridPosition != target && count < 1000)
-        {
-            if((!fromBegining && SearchBlock == SearchBlock.PreviousBlock) || (fromBegining && SearchBlock == SearchBlock.NextBlock))
-            {
-                Debug.LogError("DistanceToEnd : Loop at : " + SearchBlock.GridPosition);
-                break;
-            }
+    public int DistanceToBegining(Vector2Int target)
+    {
+        if (Circuit.TryGetValue(target, out CircuitBlock block))
+            return LastBlock.Order - block.Order;
 
-            if (fromBegining)
-                SearchBlock = SearchBlock.NextBlock;
-            else
-                SearchBlock = SearchBlock.PreviousBlock;
-            count++;
-        }
-
-        if (SearchBlock != null)
-        {
-            Debug.Log("DistanceToEnd : Searching for position : " + target + " Found position : " + SearchBlock.GridPosition + " in " + count + " steps");
-            return count;
-        }
         return -1;
     }
 
@@ -101,6 +86,8 @@ public class MapBuilder : MonoBehaviour
             CreateBlock(true);
         for (int i = 0; i < clusterSize; i++)
             CreateBlock(false);
+
+        ReorderBlocks();
     }
 
     void CreateBlock(bool straight)
@@ -204,5 +191,17 @@ public class MapBuilder : MonoBehaviour
         Bumper bumper = Instantiate(BumperPrefab, transform);
         Bumpers.Add(CurrentPosition - CurrentOrientation, bumper);
         CurrentPosition = bumper.Init(CurrentPosition, CurrentOrientation);
+    }
+
+    void ReorderBlocks()
+    {
+        CircuitBlock block = Circuit[CurrentPosition];
+        int count = 0;
+        while(block != null)
+        {
+            block.SetOrder(count);
+            block = block.PreviousBlock;
+            count++;
+        }
     }
 }

@@ -8,6 +8,7 @@ public class CircuitBlock : MonoBehaviour
 
     public Vector2Int GridPosition { get; private set; }
     public Vector2Int Orientation { get; private set; }
+    public int Order { get; private set; }
     [HideInInspector]
     public CircuitBlock NextBlock;
     [HideInInspector]
@@ -31,5 +32,10 @@ public class CircuitBlock : MonoBehaviour
         Normal = Vector2.Perpendicular(projection);
 
         return progress;
+    }
+
+    public void SetOrder(int Order)
+    {
+        this.Order = Order;
     }
 }

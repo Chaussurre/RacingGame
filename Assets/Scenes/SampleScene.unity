@@ -169,7 +169,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f89b37f9a3b276c4faaaeb2f6377c7b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MainCar: {fileID: 993684853}
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0
@@ -297,18 +296,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c0c1f6ce2cba6274286bce02e678778f, type: 3}
---- !u!114 &993684853 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 166521019379247298, guid: 7f7ee37807e043b42ac26d320f8cf79c,
-    type: 3}
-  m_PrefabInstance: {fileID: 2172717914812783880}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 01b3b9bf5c524e148a4ff511b36700bf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1206281287
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -626,7 +613,7 @@ PrefabInstance:
     - target: {fileID: 7494064825946155981, guid: 3d58bfd6c799143419c714dd44cea788,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3d58bfd6c799143419c714dd44cea788, type: 3}

@@ -20,6 +20,6 @@ public class TurnBlock : CircuitBlock
     {
         Normal = (Position - origin.position).normalized;
 
-        return 0f;
+        return -Vector2.Angle(Orientation, Normal);
     }
 }

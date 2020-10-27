@@ -18,7 +18,7 @@ public class MapBuilder : MonoBehaviour
 
     public MiniMap miniMap { get; private set; }
     private Vector2Int CurrentPosition = -Vector2Int.up;
-    private CircuitBlock LastBlock = null;
+    public CircuitBlock LastBlock { get; private set; } = null;
     private Vector2Int CurrentOrientation = Vector2Int.up;
 
     public readonly Dictionary<Vector2Int, CircuitBlock> Circuit = new Dictionary<Vector2Int, CircuitBlock>();

@@ -24,6 +24,7 @@ public class CarController : MonoBehaviour
     private Rigidbody2D Body;
     private CarControllerInput ControllerInput;
     public Bumper Bumped { get; private set; } = null;
+    public int score { get; private set; } = 0;
 
     Vector2 PreviousSpeed;
 
@@ -166,5 +167,27 @@ public class CarController : MonoBehaviour
             Body.velocity = -.8f * PreviousSpeed;
 
 
+    }
+
+    public void Score()
+    {
+        score++;
+
+        StopAllCoroutines();
+        Bumped = null;
+        gameObject.layer = LayerMask.NameToLayer("Default");
+
+        CarController lastPlayer = GameManager.Instance.FindLastPlayer();
+        Vector2Int GridPos = MapBuilder.Instance.PositionToGrid(lastPlayer.EffectivePosition);
+
+        if (MapBuilder.Instance.Circuit.TryGetValue(GridPos, out CircuitBlock block))
+            block = block.PreviousBlock;
+
+        if (block == null)
+            block = MapBuilder.Instance.LastBlock;
+
+        transform.position = block.transform.position;
+        Body.velocity = (Vector2.zero + block.Orientation) * SpeedMax;
+        transform.rotation = block.transform.rotation;
     }
 }

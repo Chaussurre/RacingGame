@@ -16,10 +16,9 @@ public class AIInput : CarControllerInput
         Vector3 RelativeTarget = GetTarget() - transform.position;
 
 
-        inputData.Horizontal = 0;
-        //inputData.Horizontal = 1;
-        //if (Vector2.Dot(RelativeTarget, transform.right) < 0)
-        //    inputData.Horizontal = -1;
+        inputData.Horizontal = 1;
+        if (Vector2.Dot(RelativeTarget, transform.right) < 0)
+            inputData.Horizontal = -1;
 
         inputData.Forward = 1;
         inputData.Turbo = false;

@@ -4,26 +4,35 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager Instance;
+
     [HideInInspector]
     public readonly List<CarController> Players = new List<CarController>();
 
     [SerializeField]
     private PositionLine PositionLine;
 
-    public static GameManager Instance;
-
+    [SerializeField]
+    private float ScoreTimerMax;
+    private float ScoreTimer;
     // Start is called before the first frame update
     void Awake()
     {
         Instance = this;
         Players.AddRange(FindObjectsOfType<CarController>());
         Debug.Log("Found " + Players.Count + " players!");
-
+        ScoreTimer = ScoreTimerMax;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         PositionLine.SetFollowedCar(FindFirstPlayer());
+
+        if (ScoreTimer < 0)
+            ScoreFirstPlayer();
+        else ScoreTimer -= Time.fixedDeltaTime;
+
+        FadePositionLine();
     }
 
     public CarController FindFirstPlayer()
@@ -105,5 +114,25 @@ public class GameManager : MonoBehaviour
         PositionLine.SetFollowedCar(mainPlayer); //FIXME
 
         MapBuilder.Instance.miniMap.SetFollowedCar(mainPlayer);
+    }
+
+    public void ScoreFirstPlayer()
+    {
+        CarController first = FindFirstPlayer();
+        first.Score();
+
+        ScoreTimer = ScoreTimerMax;
+    }
+    void FadePositionLine()
+    {
+        SpriteRenderer renderer = PositionLine.GetComponent<SpriteRenderer>();
+        float alpha = 0;
+
+        if (ScoreTimer < ScoreTimerMax * .5f && ScoreTimer > ScoreTimerMax * 0.2f)
+            alpha = (ScoreTimerMax * .5f - ScoreTimer) / (ScoreTimerMax / 3f); //Linear value between 50% and 80%
+        else if (ScoreTimer <= 0.2f * ScoreTimerMax)
+            alpha = 1;
+
+        renderer.color = new Color(renderer.color.r, renderer.color.g, renderer.color.b , alpha);
     }
 }

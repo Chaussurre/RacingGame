@@ -160,6 +160,9 @@ public class CarController : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        if (collision.gameObject.TryGetComponent(out CarController _))
+            return;
+
         Vector2 CollisionNormal = collision.contacts[0].normal;
         float CollisionAngle = Mathf.Abs(Vector2.Angle(transform.up, CollisionNormal));
 

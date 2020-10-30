@@ -13,8 +13,10 @@ public class AIInput : CarControllerInput
     public override ControlInputData GetInput()
     {
         ControlInputData inputData = new ControlInputData();
+        
         if (car.Bumped != null)
             return inputData;
+
         Vector3 RelativeTarget = GetTarget() - transform.position;
 
         inputData.Horizontal = 1;
@@ -31,8 +33,9 @@ public class AIInput : CarControllerInput
     {
 
         Vector2Int GridPos = MapBuilder.Instance.PositionToGrid(car.EffectivePosition);
-        CircuitBlock block = MapBuilder.Instance.Circuit[GridPos];
+        if (MapBuilder.Instance.Circuit.TryGetValue(GridPos, out CircuitBlock block))
+            return block.NextBlock.transform.position;
 
-        return block.NextBlock.transform.position;
+        return car.transform.position + car.transform.up;
     }
 }

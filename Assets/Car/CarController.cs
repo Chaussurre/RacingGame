@@ -25,6 +25,7 @@ public class CarController : MonoBehaviour
     private CarControllerInput ControllerInput;
     public Bumper Bumped { get; private set; } = null;
     public int score { get; private set; } = 0;
+    private float GhostTimer = 0;
 
     Vector2 PreviousSpeed;
 
@@ -33,7 +34,7 @@ public class CarController : MonoBehaviour
     {
         Body = GetComponent<Rigidbody2D>();
         ControllerInput = GetComponentInChildren<CarControllerInput>();
-        ColorCarRenderer.color = color;
+        SetColor(color);
     }
 
     private void Update()
@@ -42,13 +43,16 @@ public class CarController : MonoBehaviour
             EffectivePosition = CarFont.position;
     }
 
-    // Update is called once per frame
     void FixedUpdate()
     {
         PreviousSpeed = Body.velocity;
 
         //If mid-air, stop here
         if (Bumped != null)
+            return;
+
+        //Resapawning
+        if (GhostMod())
             return;
 
         ControlInputData inputData = ControllerInput.GetInput();
@@ -129,6 +133,42 @@ public class CarController : MonoBehaviour
         StartCoroutine("BumpRoutine", landingPosition);
     }
 
+    bool GhostMod()
+    {
+        gameObject.layer = LayerMask.NameToLayer("Ghost");
+        Color faded = new Color(color.r, color.g, color.b, 0.5f);
+        SetColor(faded);
+
+        if (GhostTimer <= 0)
+        {
+            gameObject.layer = LayerMask.NameToLayer("Default");
+            SetColor(color);
+            return false;
+        }
+
+        GhostTimer -= Time.fixedDeltaTime;
+
+        if (Bumped == null)
+        {
+            Vector2Int GridPos = MapBuilder.Instance.PositionToGrid(EffectivePosition);
+            if (MapBuilder.Instance.Circuit.TryGetValue(GridPos, out CircuitBlock block))
+            {
+                Vector3 Parrallel = block.GetProjectedParrallel(EffectivePosition, out Vector3 Projection);
+
+                Debug.DrawRay(transform.position, Parrallel, Color.red);
+                Debug.DrawLine(transform.position, Projection, Color.blue);
+
+                Body.velocity = Parrallel * SpeedMax;
+                transform.rotation = Quaternion.Euler(0, 0, MapBuilder.DirectionToAngle(Parrallel));
+                Vector3 newPos = Projection - (CarFont.position - transform.position);
+                if (Vector3.Distance(newPos, transform.position) < 3) //FIXME There because projection not correctly working when switching blocks
+                    transform.position = newPos;
+            }
+        }
+
+        return true;
+    }
+
     IEnumerator BumpRoutine(Vector2 landingPos)
     {
         float Maxtime = 0.8f;
@@ -152,6 +192,12 @@ public class CarController : MonoBehaviour
         Bumped = null;
     }
 
+    private void SetColor(Color color)
+    {
+        ColorCarRenderer.color = color;
+        Color alphaWhite = new Color(Color.white.r, Color.white.g, Color.white.b, color.a);
+        GetComponent<SpriteRenderer>().color = alphaWhite;
+    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.transform.parent != null && collision.transform.parent.TryGetComponent(out Bumper bumper))
@@ -172,9 +218,11 @@ public class CarController : MonoBehaviour
 
     }
 
-    public void Score()
+    public void Score(float GhostTimer)
     {
         score++;
+        Debug.Log("Scoring for car : " + color + " score = " + score);
+        this.GhostTimer = GhostTimer;
 
         StopAllCoroutines();
         Bumped = null;
@@ -190,7 +238,5 @@ public class CarController : MonoBehaviour
             block = MapBuilder.Instance.LastBlock;
 
         transform.position = block.transform.position;
-        Body.velocity = (Vector2.zero + block.Orientation) * SpeedMax;
-        transform.rotation = block.transform.rotation;
     }
 }

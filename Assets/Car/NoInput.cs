@@ -6,10 +6,12 @@ public class NoInput : CarControllerInput
 {
     public override ControlInputData GetInput()
     {
-        ControlInputData inputData = new ControlInputData();
-        inputData.Forward = 0;
-        inputData.Horizontal = 0;
-        inputData.Turbo = false;
+        ControlInputData inputData = new ControlInputData
+        {
+            Forward = 0,
+            Horizontal = 0,
+            Turbo = false
+        };
 
         return inputData;
     }

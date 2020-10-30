@@ -28,7 +28,8 @@ public class PositionLine : MonoBehaviour
         }
 
 
-        block.GetProgress(followedCar.EffectivePosition, out Vector2 Normal);
+        block.GetProgress(followedCar.EffectivePosition);
+        Vector2 Normal = block.GetNormal(followedCar.EffectivePosition);
 
         Vector2 Begining = Physics2D.Raycast(followedCar.EffectivePosition, Normal, 10f, RaycastMask).point;
         Vector2 End = Physics2D.Raycast(followedCar.EffectivePosition, -Normal, 10f, RaycastMask).point;

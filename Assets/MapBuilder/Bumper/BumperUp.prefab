@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 347216446496908535}
   - component: {fileID: 7168733795442633301}
   - component: {fileID: 4501533762822247135}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: BumperUp
   m_TagString: Untagged
   m_Icon: {fileID: 0}

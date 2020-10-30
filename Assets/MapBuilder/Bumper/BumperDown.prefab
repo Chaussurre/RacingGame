@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1160935704199957642}
   - component: {fileID: -7653164653266315020}
   - component: {fileID: 2521693704991974922}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: BumperDown
   m_TagString: Untagged
   m_Icon: {fileID: 0}

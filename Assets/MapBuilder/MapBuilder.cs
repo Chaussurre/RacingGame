@@ -26,9 +26,24 @@ public class MapBuilder : MonoBehaviour
 
     public static float DirectionToAngle(Vector2Int Direction)
     {
+        /*
         float angle = -90 * Direction.x;
         if (Direction.y == -1)
             angle = 180;
+
+        return angle;
+        */
+        Vector2 vec = Direction;
+        return DirectionToAngle(vec);
+    }
+    public static float DirectionToAngle(Vector2 Direction)
+    {
+        float angle = Mathf.Acos(Direction.x) * Mathf.Rad2Deg - 90;
+        if (Direction.y < 0)
+        {
+            angle *= -1;
+            angle += 180;
+        }
 
         return angle;
     }

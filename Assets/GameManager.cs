@@ -13,6 +13,8 @@ public class GameManager : MonoBehaviour
     private PositionLine PositionLine;
 
     [SerializeField]
+    private float GhostTimerOnRespawn;
+    [SerializeField]
     private float ScoreTimerMax;
     private float ScoreTimer;
     // Start is called before the first frame update
@@ -28,10 +30,8 @@ public class GameManager : MonoBehaviour
     {
         PositionLine.SetFollowedCar(FindFirstPlayer());
 
-        if (ScoreTimer < 0)
-            ScoreFirstPlayer();
-        else ScoreTimer -= Time.fixedDeltaTime;
 
+        ScoreFirstPlayer();
         FadePositionLine();
     }
 
@@ -60,7 +60,7 @@ public class GameManager : MonoBehaviour
         CarController firstCar = null;
         foreach (CarController car in closestBlock)
         {
-            float progress = minBlock.GetProgress(car.EffectivePosition, out _);
+            float progress = minBlock.GetProgress(car.EffectivePosition);
             if (progress > MaxProgress)
             {
                 firstCar = car;
@@ -95,7 +95,7 @@ public class GameManager : MonoBehaviour
         CarController lastCar = null;
         foreach (CarController car in closestBlock)
         {
-            float progress = maxBlock.GetProgress(car.EffectivePosition, out _);
+            float progress = maxBlock.GetProgress(car.EffectivePosition);
             if (progress < MinProgress)
             {
                 lastCar = car;
@@ -118,8 +118,14 @@ public class GameManager : MonoBehaviour
 
     public void ScoreFirstPlayer()
     {
+        if (ScoreTimer > 0)
+        {
+            ScoreTimer -= Time.fixedDeltaTime;
+            return;
+        }
+
         CarController first = FindFirstPlayer();
-        first.Score();
+        first.Score(GhostTimerOnRespawn);
 
         ScoreTimer = ScoreTimerMax;
     }

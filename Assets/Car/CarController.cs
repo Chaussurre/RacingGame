@@ -46,6 +46,7 @@ public class CarController : MonoBehaviour
     void FixedUpdate()
     {
         PreviousSpeed = Body.velocity;
+        ControlInputData inputData = ControllerInput.GetInput();
 
         //If mid-air, stop here
         if (Bumped != null)
@@ -55,7 +56,6 @@ public class CarController : MonoBehaviour
         if (GhostMod())
             return;
 
-        ControlInputData inputData = ControllerInput.GetInput();
         Rotate(inputData);
         Accelerate(inputData);
         Drift();

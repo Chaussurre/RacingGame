@@ -4,13 +4,8 @@ using UnityEngine;
 
 public class AIInput : CarControllerInput
 {
-    CarController car;
     float turnBack = 0;
 
-    private void Start()
-    {
-        car = GetComponentInParent<CarController>();
-    }
     public override ControlInputData GetInput()
     {
         ControlInputData inputData = new ControlInputData();

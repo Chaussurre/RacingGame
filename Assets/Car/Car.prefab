@@ -127,7 +127,7 @@ MonoBehaviour:
   TurboAccelSpeed: 700
   RotationSpeed: 5
   SlowRotationSpeed: 8
-  MinDriftFactor: 0.2
+  MinDriftFactor: 0.05
   MaxDriftFactor: 0.5
   color: {r: 0.13333334, g: 0.23137257, b: 0.32941177, a: 1}
   CarFont: {fileID: 6688134736948487016}

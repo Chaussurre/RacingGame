@@ -239,4 +239,9 @@ public class CarController : MonoBehaviour
 
         transform.position = block.transform.position;
     }
+
+    public Vector2 GetSpeed()
+    {
+        return Body.velocity;
+    }
 }

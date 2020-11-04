@@ -13,12 +13,13 @@ public class CarController : MonoBehaviour
     public float MinDriftFactor;
     public float MaxDriftFactor;
 
+
     public Color color;
 
     public Vector2 EffectivePosition { get; private set; } //The car's position in the circuit that takes bumper into account
 
     [SerializeField]
-    private Transform CarFont;
+    private Transform CarFront;
     [SerializeField]
     private SpriteRenderer ColorCarRenderer;
     private Rigidbody2D Body;
@@ -29,9 +30,12 @@ public class CarController : MonoBehaviour
 
     Vector2 PreviousSpeed;
 
+    public float CarSize { get; private set; }
+
     float SpeedForward = 0;
     void Start()
     {
+        CarSize = (CarFront.position - transform.position).magnitude * 2;
         Body = GetComponent<Rigidbody2D>();
         ControllerInput = GetComponentInChildren<CarControllerInput>();
         SetColor(color);
@@ -40,7 +44,7 @@ public class CarController : MonoBehaviour
     private void Update()
     {
         if (Bumped == null)
-            EffectivePosition = CarFont.position;
+            EffectivePosition = CarFront.position;
     }
 
     void FixedUpdate()
@@ -126,7 +130,8 @@ public class CarController : MonoBehaviour
 
         Bumped = bumper;
         Vector2 BumperDist = (Vector2.zero + bumper.StopingPoint - bumper.StartingPoint) * MapBuilder.Instance.BlockSize;
-        Vector2 landingPosition = new Vector2(transform.position.x, transform.position.y) + BumperDist + (Vector2.zero + bumper.Direction) * 0.2f;
+        Vector2 landingPosition = new Vector2(transform.position.x, transform.position.y) + BumperDist + 
+            ((Vector2.zero + bumper.Direction) * CarSize * 2f);
 
         transform.rotation = Quaternion.Euler(0, 0, MapBuilder.DirectionToAngle(bumper.Direction));
 
@@ -160,7 +165,7 @@ public class CarController : MonoBehaviour
 
                 Body.velocity = Parrallel * SpeedMax;
                 transform.rotation = Quaternion.Euler(0, 0, MapBuilder.DirectionToAngle(Parrallel));
-                Vector3 newPos = Projection - (CarFont.position - transform.position);
+                Vector3 newPos = Projection - (CarFront.position - transform.position);
                 if (Vector3.Distance(newPos, transform.position) < 3) //FIXME There because projection not correctly working when switching blocks
                     transform.position = newPos;
             }
@@ -181,6 +186,7 @@ public class CarController : MonoBehaviour
 
         while (timer > 0)
         {
+            Debug.DrawLine(transform.position, landingPos, Color.cyan, delay);
             Body.velocity = (landingPos - new Vector2(transform.position.x, transform.position.y)) / timer;
             timer -= delay;
             yield return new WaitForSeconds(delay);

@@ -26,13 +26,6 @@ public class MapBuilder : MonoBehaviour
 
     public static float DirectionToAngle(Vector2Int Direction)
     {
-        /*
-        float angle = -90 * Direction.x;
-        if (Direction.y == -1)
-            angle = 180;
-
-        return angle;
-        */
         Vector2 vec = Direction;
         return DirectionToAngle(vec);
     }

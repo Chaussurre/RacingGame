@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class AIInput : CarControllerInput
 {
+    public float TimerGoBack; //How long does it go backward after hitting a wall
     float turnBack = 0;
 
     public override ControlInputData GetInput()
@@ -22,6 +23,7 @@ public class AIInput : CarControllerInput
         if (Vector2.Dot(RelativeTarget, transform.right) < 0)
             inputData.Horizontal = -1;
 
+        inputData.Turbo = true;
         if (turnBack <= 0)
             inputData.Forward = 1;
         else //Just hit a wall
@@ -29,8 +31,8 @@ public class AIInput : CarControllerInput
             turnBack -= Time.fixedDeltaTime;
             inputData.Forward = -1;
             inputData.Horizontal = 0;
+            inputData.Turbo = false;
         }
-        inputData.Turbo = false;
 
         return inputData;
     }
@@ -48,6 +50,6 @@ public class AIInput : CarControllerInput
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.layer == LayerMask.NameToLayer("Circuit"))
-            turnBack = 0.7f;
+            turnBack = TimerGoBack;
     }
 }

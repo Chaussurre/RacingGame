@@ -130,7 +130,7 @@ MonoBehaviour:
   MinDriftFactor: 0.05
   MaxDriftFactor: 0.5
   color: {r: 0.13333334, g: 0.23137257, b: 0.32941177, a: 1}
-  CarFont: {fileID: 6688134736948487016}
+  CarFront: {fileID: 6688134736948487016}
   ColorCarRenderer: {fileID: 1241991261700166620}
 --- !u!70 &5384530024722022712
 CapsuleCollider2D:

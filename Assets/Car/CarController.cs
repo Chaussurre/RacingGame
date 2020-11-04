@@ -12,8 +12,6 @@ public class CarController : MonoBehaviour
     public float SlowRotationSpeed;
     public float MinDriftFactor;
     public float MaxDriftFactor;
-
-
     public Color color;
 
     public Vector2 EffectivePosition { get; private set; } //The car's position in the circuit that takes bumper into account
@@ -26,7 +24,7 @@ public class CarController : MonoBehaviour
     private CarControllerInput ControllerInput;
     public Bumper Bumped { get; private set; } = null;
     public int score { get; private set; } = 0;
-    private float GhostTimer = 0;
+    bool respawning = false;
 
     Vector2 PreviousSpeed;
 
@@ -52,13 +50,10 @@ public class CarController : MonoBehaviour
         PreviousSpeed = Body.velocity;
         ControlInputData inputData = ControllerInput.GetInput();
 
-        //If mid-air, stop here
-        if (Bumped != null)
+        //If mid-air or respawning, stop here
+        if (Bumped != null || respawning)
             return;
 
-        //Resapawning
-        if (GhostMod())
-            return;
 
         Rotate(inputData);
         Accelerate(inputData);
@@ -80,7 +75,7 @@ public class CarController : MonoBehaviour
         float EffectiveAccelSpeed = AccelSpeed;
         float EffectiveSpeedMax = SpeedMax;
 
-        if(inputData.Turbo)
+        if (inputData.Turbo)
         {
             EffectiveAccelSpeed = TurboAccelSpeed;
             EffectiveSpeedMax = TurboSpeedMax;
@@ -103,7 +98,7 @@ public class CarController : MonoBehaviour
         Body.velocity *= 0.95f;
     }
 
-   void Drift()
+    void Drift()
     {
         SpeedForward = Vector2.Dot(Body.velocity, transform.up);
 
@@ -130,7 +125,7 @@ public class CarController : MonoBehaviour
 
         Bumped = bumper;
         Vector2 BumperDist = (Vector2.zero + bumper.StopingPoint - bumper.StartingPoint) * MapBuilder.Instance.BlockSize;
-        Vector2 landingPosition = new Vector2(transform.position.x, transform.position.y) + BumperDist + 
+        Vector2 landingPosition = new Vector2(transform.position.x, transform.position.y) + BumperDist +
             ((Vector2.zero + bumper.Direction) * CarSize * 2f);
 
         transform.rotation = Quaternion.Euler(0, 0, MapBuilder.DirectionToAngle(bumper.Direction));
@@ -138,46 +133,9 @@ public class CarController : MonoBehaviour
         StartCoroutine("BumpRoutine", landingPosition);
     }
 
-    bool GhostMod()
-    {
-        gameObject.layer = LayerMask.NameToLayer("Ghost");
-        Color faded = new Color(color.r, color.g, color.b, 0.5f);
-        SetColor(faded);
-
-        if (GhostTimer <= 0)
-        {
-            gameObject.layer = LayerMask.NameToLayer("Default");
-            SetColor(color);
-            return false;
-        }
-
-        GhostTimer -= Time.fixedDeltaTime;
-
-        if (Bumped == null)
-        {
-            Vector2Int GridPos = MapBuilder.Instance.PositionToGrid(EffectivePosition);
-            if (MapBuilder.Instance.Circuit.TryGetValue(GridPos, out CircuitBlock block))
-            {
-                Vector3 Parrallel = block.GetProjectedParrallel(EffectivePosition, out Vector3 Projection);
-
-                Debug.DrawRay(transform.position, Parrallel, Color.red);
-                Debug.DrawLine(transform.position, Projection, Color.blue);
-
-                Body.velocity = Parrallel * SpeedMax;
-                transform.rotation = Quaternion.Euler(0, 0, MapBuilder.DirectionToAngle(Parrallel));
-                Vector3 newPos = Projection - (CarFront.position - transform.position);
-                if (Vector3.Distance(newPos, transform.position) < 3) //FIXME There because projection not correctly working when switching blocks
-                    transform.position = newPos;
-            }
-        }
-
-        return true;
-    }
-
     IEnumerator BumpRoutine(Vector2 landingPos)
     {
         float Maxtime = 0.8f;
-        float delay = 0.1f;
         float timer = Maxtime;
 
         gameObject.layer = LayerMask.NameToLayer("IgnorePhysics");
@@ -186,16 +144,70 @@ public class CarController : MonoBehaviour
 
         while (timer > 0)
         {
-            Debug.DrawLine(transform.position, landingPos, Color.cyan, delay);
+            Debug.DrawLine(transform.position, landingPos, Color.cyan);
             Body.velocity = (landingPos - new Vector2(transform.position.x, transform.position.y)) / timer;
-            timer -= delay;
-            yield return new WaitForSeconds(delay);
+            timer -= Time.fixedDeltaTime;
+            yield return new WaitForFixedUpdate();
         }
 
         transform.position = landingPos;
         Body.velocity = (Vector2.zero + Bumped.Direction) * SpeedMax;
         gameObject.layer = LayerMask.NameToLayer("Default");
         Bumped = null;
+    }
+
+    IEnumerator ScoreRespawnRoutine(float GhostTimer)
+    {
+        respawning = true;
+        Bumped = null;
+        gameObject.layer = LayerMask.NameToLayer("Default");
+
+        //Dash fade part
+
+        //GhostMode part
+        CarController lastPlayer = GameManager.Instance.FindLastPlayer();
+        Vector2Int GridPos = MapBuilder.Instance.PositionToGrid(lastPlayer.EffectivePosition);
+
+        if (MapBuilder.Instance.Circuit.TryGetValue(GridPos, out CircuitBlock block))
+            block = block.PreviousBlock;
+
+        if (block == null)
+            block = MapBuilder.Instance.LastBlock;
+
+        transform.position = block.transform.position;
+
+        gameObject.layer = LayerMask.NameToLayer("Ghost");
+        Color faded = new Color(color.r, color.g, color.b, 0.5f);
+        SetColor(faded);
+        
+        while (GhostTimer > 0)
+        {
+            Body.velocity = Vector2.zero;
+            GhostMode();
+            GhostTimer -= Time.fixedDeltaTime;
+            yield return new WaitForFixedUpdate();
+        }
+        
+        gameObject.layer = LayerMask.NameToLayer("Default");
+        SetColor(color);
+        respawning = false;
+    }
+
+    void GhostMode()
+    {
+        if (Bumped != null)
+            return;
+
+        Vector2Int GridPos = MapBuilder.Instance.PositionToGrid(transform.position);
+        if (!MapBuilder.Instance.Circuit.TryGetValue(GridPos, out CircuitBlock block))
+            return;
+
+        Vector3 Parrallel = block.GetProjectedParrallel(transform.position, out Vector3 Projection);
+
+        transform.rotation = Quaternion.Euler(0, 0, MapBuilder.DirectionToAngle(Parrallel));
+        transform.position = Projection + Parrallel * SpeedMax * Time.fixedDeltaTime;
+
+        Debug.DrawRay(transform.position, Parrallel, Color.red);
     }
 
     private void SetColor(Color color)
@@ -228,22 +240,9 @@ public class CarController : MonoBehaviour
     {
         score++;
         Debug.Log("Scoring for car : " + color + " score = " + score);
-        this.GhostTimer = GhostTimer;
 
         StopAllCoroutines();
-        Bumped = null;
-        gameObject.layer = LayerMask.NameToLayer("Default");
-
-        CarController lastPlayer = GameManager.Instance.FindLastPlayer();
-        Vector2Int GridPos = MapBuilder.Instance.PositionToGrid(lastPlayer.EffectivePosition);
-
-        if (MapBuilder.Instance.Circuit.TryGetValue(GridPos, out CircuitBlock block))
-            block = block.PreviousBlock;
-
-        if (block == null)
-            block = MapBuilder.Instance.LastBlock;
-
-        transform.position = block.transform.position;
+        StartCoroutine("ScoreRespawnRoutine", GhostTimer);
     }
 
     public Vector2 GetSpeed()

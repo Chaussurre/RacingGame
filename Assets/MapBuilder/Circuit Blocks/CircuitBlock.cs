@@ -40,6 +40,7 @@ public class CircuitBlock : MonoBehaviour
     public virtual Vector2 GetProjectedParrallel(Vector3 Position, out Vector3 Projection)
     {
         Projection = (Vector2.zero + Orientation) * GetProgress(Position);
+        Projection += transform.position;
         return Orientation;
     }
 

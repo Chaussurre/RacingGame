@@ -10,28 +10,22 @@ public class MouseInput : CarControllerInput
         GameManager.Instance.SetMainPlayer(car);
     }
 
-    public override ControlInputData GetInput()
+    protected override Vector2 GetTargetPoint()
     {
-        Vector2 Center = Camera.main.transform.position;
+        return Camera.main.ScreenToWorldPoint(Input.mousePosition); ;
+    }
 
-        Vector2 pointed = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+    protected override bool GetTurbo()
+    {
+        return Input.GetMouseButton(0) && Input.GetMouseButton(1);
+    }
 
-        ControlInputData inputData = new ControlInputData();
-
+    protected override float GetForward()
+    {
         if (Input.GetMouseButton(0))
-        {
-            inputData.Forward = 1;
-            if (Input.GetMouseButton(1))
-                inputData.Turbo = true;
-        }
-        else if (Input.GetMouseButton(1))
-            inputData.Forward = -1;
-
-        float Angle = (Vector2.Angle(transform.right, pointed - Center) - 90) * -1;
-        Debug.Log("going back : " + Mathf.Sign(Vector2.Dot(car.GetSpeed(), car.transform.up)));
-        if (Mathf.Abs(Angle) > 10)
-            inputData.Horizontal = Mathf.Sign(Angle) * Mathf.Sign(Vector2.Dot(car.GetSpeed(), car.transform.up));
-
-        return inputData;
+            return 1;
+        if (Input.GetMouseButton(1))
+            return -1;
+        return 0;
     }
 }

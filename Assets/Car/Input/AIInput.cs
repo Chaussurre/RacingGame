@@ -7,39 +7,8 @@ public class AIInput : CarControllerInput
     public float TimerGoBack; //How long does it go backward after hitting a wall
     float turnBack = 0;
 
-    public override ControlInputData GetInput()
+    protected override Vector2 GetTargetPoint()
     {
-        ControlInputData inputData = new ControlInputData();
-
-        if (car.Bumped != null)
-        {
-            turnBack = 0;
-            return inputData;
-        }
-
-        Vector3 RelativeTarget = GetTarget() - transform.position;
-
-        inputData.Horizontal = 1;
-        if (Vector2.Dot(RelativeTarget, transform.right) < 0)
-            inputData.Horizontal = -1;
-
-        inputData.Turbo = true;
-        if (turnBack <= 0)
-            inputData.Forward = 1;
-        else //Just hit a wall
-        {
-            turnBack -= Time.fixedDeltaTime;
-            inputData.Forward = -1;
-            inputData.Horizontal = 0;
-            inputData.Turbo = false;
-        }
-
-        return inputData;
-    }
-
-    Vector3 GetTarget()
-    {
-
         Vector2Int GridPos = MapBuilder.Instance.PositionToGrid(car.EffectivePosition);
         if (MapBuilder.Instance.Circuit.TryGetValue(GridPos, out CircuitBlock block))
             return block.NextBlock.transform.position;
@@ -47,9 +16,25 @@ public class AIInput : CarControllerInput
         return car.transform.position + car.transform.up;
     }
 
+    protected override bool GetTurbo()
+    {
+        return turnBack <= 0;
+    }
+
+    protected override float GetForward()
+    {
+        if (turnBack <= 0)
+            return 1;
+        turnBack -= Time.fixedDeltaTime;
+        return -1;
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Circuit"))
-            turnBack = TimerGoBack;
+        if (car.Bumped == null)
+        {
+            if (collision.gameObject.layer == LayerMask.NameToLayer("Circuit"))
+                turnBack = TimerGoBack;
+        }
     }
 }

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 785918918596588822}
   - component: {fileID: 2972589707100501837}
   m_Layer: 0
-  m_Name: PlayerInput
+  m_Name: KeyBoardInput
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -43,3 +43,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 610d17576e7b04342a892e4c2c14c5ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sensibility: 0.5

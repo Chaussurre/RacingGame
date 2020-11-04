@@ -4,15 +4,18 @@ using UnityEngine;
 
 public class NoInput : CarControllerInput
 {
-    public override ControlInputData GetInput()
+    protected override bool GetTurbo()
     {
-        ControlInputData inputData = new ControlInputData
-        {
-            Forward = 0,
-            Horizontal = 0,
-            Turbo = false
-        };
+        return false;
+    }
 
-        return inputData;
+    protected override float GetForward()
+    {
+        return 0;
+    }
+
+    protected override Vector2 GetTargetPoint()
+    {
+        return car.transform.up;
     }
 }
